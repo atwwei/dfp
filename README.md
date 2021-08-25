@@ -1,2 +1,108 @@
-# dfp
-Google Publisher Tags (Doubleclick GPT) for Angular
+# @wwei/dfp
+
+@wwei/dfp is an [angular](https://angular.io) (>=12) module for displaying google dfp ads using [Google Publisher Tag (Doubleclick GPT)](https://developers.google.com/publisher-tag/reference).
+
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version **12.0.4**.
+
+[![npm version](https://badge.fury.io/js/@wwei%2Fdfp.svg)](https://badge.fury.io/js/@wwei%2Fdfp)
+[![npm](https://img.shields.io/npm/l/express.svg?style=flat-square)](https://github.com/atwwei/dfp/blob/master/LICENSE)
+
+## Usage
+
+Add `DfpModule` to the imports of your NgModule.
+
+```
+import { DfpModule } from '@wwei/dfp';
+
+@NgModule({
+  imports: [
+    DfpModule,
+    ...
+  ],
+  ...
+})
+export class AppModule {}
+...
+```
+
+Use [googletag](https://www.npmjs.com/package/@types/googletag) to customize page-level settings before the service is enabled.
+
+```
+import { DfpService } from '@wwei/dfp';
+
+@Component({
+  selector: 'app-app',
+  templateUrl: './app.component.html',
+})
+export class AppComponent {
+  constructor(private dfp: DfpService) {
+    // Use googletag to customize page-level settings
+    this.dfp.cmd(() => {
+      googletag.pubads().collapseEmptyDivs();
+      googletag.pubads().enableSingleRequest();
+      ...
+    });
+  }
+}
+```
+
+Use `DfpAdDirective` in angular templates to define and display advertisements.
+
+```
+<div
+  *dfpAd="{
+    unitPath: '/6355419/Travel',
+    id: 'ad-div-id',
+    size: [728, 90],
+    sizeMapping: [
+      [[1024, 768], [970, 250]],
+      [[980, 690], 'fluid'],
+      [[640, 480], [120, 60]],
+      [[0, 0], []]
+    ],
+    categoryExclusion: 'AirlineAd',
+    clickUrl: 'http://www.example.com?original_click_url=',
+    collapseEmptyDiv: [true, true],
+    forceSafeFrame: true,
+    safeFrameConfig: { sandbox: true },
+    targeting: { test: 'refresh' },
+    adsense: { adsense_test_mode: 'on' },
+    content: 'Set the content manually'
+  }"
+></div>
+```
+
+_The following settings can override the above settings with the same name._
+
+```
+<div
+  *dfpAd="
+    '/6355419/Travel';
+    id: 'ad-div-id';
+    size: [728, 90];
+    sizeMapping: [
+      [[1024, 768], [970, 250]],
+      [[980, 690], 'fluid'],
+      [[640, 480], [120, 60]],
+      [[0, 0], []]
+    ];
+    categoryExclusion: 'AirlineAd';
+    clickUrl: 'http://www.example.com?original_click_url=';
+    collapseEmptyDiv: [true, true];
+    forceSafeFrame: true;
+    safeFrameConfig: { sandbox: true };
+    targeting: { test: 'refresh' };
+    adsense: { adsense_test_mode: 'on' };
+    content: 'Set the content manually';
+  "
+></div>
+```
+
+## Online Examples
+
+https://atwwei.github.io/dfp
+
+## Angular 6
+
+[ngx-dfp](https://www.npmjs.com/package/ngx-dfp)
+Semantic DoubleClick for Publishers (DFP by Google) integration with **Angular 6**.

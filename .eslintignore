@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+
+# test
+karma.conf.js
+test.ts
+*.spec.ts
