@@ -1,7 +1,7 @@
 {
   "name": "@wwei/dfp",
   "description": "Asynchronous rendering ads with Google Publisher Tag (Doubleclick GPT) for Angular",
-  "version": "12.3.2",
+  "version": "12.3.3",
   "license": "MIT",
   "author": {
     "name": "atwwei",
@@ -15,7 +15,7 @@
     "url": "git@github.com:atwwei/dfp"
   },
   "dependencies": {
-    "@types/googletag": "^1.0.3",
+    "@types/googletag": "^1.1.0",
     "tslib": "^2.2.0"
   },
   "main": "bundles/dfp.umd.js",
