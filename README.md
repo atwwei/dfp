@@ -4,8 +4,9 @@
 
 This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version **12.0.4**.
 
-[![npm version](https://badge.fury.io/js/@wwei%2Fdfp.svg)](https://badge.fury.io/js/@wwei%2Fdfp)
-[![npm](https://img.shields.io/npm/l/express.svg?style=flat-square)](https://github.com/atwwei/dfp/blob/master/LICENSE)
+[![version](https://badge.fury.io/js/@wwei%2Fdfp.svg)](https://www.npmjs.com/package/@wwei/dfp)
+[![ngx-dfp](https://img.shields.io/badge/angular6-ngx--dfp-red.svg)](https://www.npmjs.com/package/ngx-dfp)
+[![license](https://img.shields.io/npm/l/express.svg?style=flat-square)](https://github.com/atwwei/dfp/blob/master/LICENSE)
 
 ## Usage
 
@@ -101,8 +102,3 @@ _The following settings can override the above settings with the same name._
 ## Online Examples
 
 https://atwwei.github.io/dfp
-
-## Angular 6
-
-[ngx-dfp](https://www.npmjs.com/package/ngx-dfp)
-Semantic DoubleClick for Publishers (DFP by Google) integration with **Angular 6**.
