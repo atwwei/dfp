@@ -1,11 +1,11 @@
 /// <reference types="googletag" />
-declare class DfpAction {
+declare class SlotRequest {
     slot: googletag.Slot;
     constructor(slot: googletag.Slot);
 }
-export declare class DfpAdDisplay extends DfpAction {
+export declare class DisplaySlot extends SlotRequest {
 }
-export declare class DfpAdRefresh extends DfpAction {
+export declare class RefreshSlot extends SlotRequest {
 }
-export declare type Action = DfpAdDisplay | DfpAdRefresh;
+export declare type Request = DisplaySlot | RefreshSlot;
 export {};

@@ -2,7 +2,7 @@ import { isPlatformBrowser, DOCUMENT } from '@angular/common';
 import * as i0 from '@angular/core';
 import { PLATFORM_ID, Injectable, Inject, Directive, Optional, Input, NgModule } from '@angular/core';
 import { Subject, timer } from 'rxjs';
-import { filter, map, buffer, switchMap, takeUntil } from 'rxjs/operators';
+import { buffer, switchMap, takeUntil, filter } from 'rxjs/operators';
 import * as i2 from '@angular/router';
 import { NavigationEnd } from '@angular/router';
 
@@ -27,56 +27,49 @@ class SlotVisibilityChangedEvent extends GptEvent {
 const GPT_SOURCE = 'https://securepubads.g.doubleclick.net/tag/js/gpt.js';
 const DELAY_TIME = 50;
 
-class DfpAction {
+class SlotRequest {
     constructor(slot) {
         this.slot = slot;
     }
 }
-class DfpAdDisplay extends DfpAction {
+class DisplaySlot extends SlotRequest {
 }
-class DfpAdRefresh extends DfpAction {
+class RefreshSlot extends SlotRequest {
 }
 
 class DfpService {
     constructor(platformId, document) {
         this.platformId = platformId;
         this.document = document;
-        this.$queue = new Subject();
+        this.$singleRequest = new Subject();
         this.$events = new Subject();
         if (isPlatformBrowser(this.platformId)) {
-            this.initializeGPT();
-            this.startActionQueue();
-            this.addEventListeners();
+            this.init();
         }
     }
     get events() {
         return this.$events.asObservable();
     }
-    initializeGPT() {
-        this.appendScript({ async: true, src: GPT_SOURCE });
-        window.googletag = window.googletag || { cmd: [] };
-    }
-    startActionQueue() {
-        const displaySlots = [];
-        this.$queue
-            .pipe(filter((act) => {
-            if (act instanceof DfpAdDisplay) {
-                displaySlots.push(act.slot);
-                return false;
-            }
-            return (act instanceof DfpAdRefresh && displaySlots.indexOf(act.slot) === -1);
-        }), map((act) => act.slot), buffer(this.$queue.pipe(switchMap(() => timer(DELAY_TIME * 2)))))
-            .subscribe((refreshSlots) => {
-            displaySlots.forEach((slot) => {
-                googletag.display(slot);
+    init() {
+        // GPT
+        if (!window.googletag) {
+            this.appendScript({ async: true, src: GPT_SOURCE });
+            window.googletag = window.googletag || { cmd: [] };
+        }
+        // Single Request Queue
+        this.$singleRequest
+            .pipe(buffer(this.$singleRequest.pipe(switchMap(() => timer(DELAY_TIME * 2)))))
+            .subscribe((acts) => {
+            acts.forEach((act) => {
+                if (act instanceof DisplaySlot) {
+                    googletag.display(act.slot);
+                }
+                else if (act instanceof RefreshSlot) {
+                    googletag.pubads().refresh([act.slot], { changeCorrelator: false });
+                }
             });
-            displaySlots.splice(0);
-            if (refreshSlots.length > 0) {
-                googletag.pubads().refresh(refreshSlots);
-            }
         });
-    }
-    addEventListeners() {
+        // Event Listeners
         googletag.cmd.push(() => {
             const pubads = googletag.pubads();
             pubads.addEventListener('impressionViewable', (event) => {
@@ -99,58 +92,131 @@ class DfpService {
             });
         });
     }
-    clear(elementIds) {
-        this.cmd(() => {
-            googletag.pubads().clear(this.getSlots(elementIds));
-        });
+    define(ad) {
+        let slot;
+        let id = ad.id || '';
+        if (id) {
+            const slotExists = this.getSlot(id);
+            if ((slotExists === null || slotExists === void 0 ? void 0 : slotExists.getAdUnitPath()) === ad.unitPath) {
+                slot = slotExists;
+            }
+            else if (slotExists) {
+                this.destroy(slotExists);
+            }
+        }
+        if (!slot) {
+            if (ad.size) {
+                slot = googletag.defineSlot(ad.unitPath, ad.size, id);
+            }
+            else {
+                slot = googletag.defineOutOfPageSlot(ad.unitPath, id);
+            }
+            if (!slot) {
+                return;
+            }
+        }
+        if (ad.size && ad.content) {
+            slot.addService(googletag.content());
+            googletag.enableServices();
+            googletag.content().setContent(slot, ad.content);
+        }
+        else {
+            if (ad.sizeMapping) {
+                slot.defineSizeMapping(ad.sizeMapping);
+            }
+            slot.clearCategoryExclusions();
+            if (ad.categoryExclusion) {
+                if (ad.categoryExclusion instanceof Array) {
+                    ad.categoryExclusion.forEach((cat) => slot === null || slot === void 0 ? void 0 : slot.setCategoryExclusion(cat));
+                }
+                else {
+                    slot.setCategoryExclusion(ad.categoryExclusion);
+                }
+            }
+            if (typeof ad.forceSafeFrame === 'boolean') {
+                slot.setForceSafeFrame(ad.forceSafeFrame);
+            }
+            if (ad.safeFrameConfig) {
+                slot.setSafeFrameConfig(ad.safeFrameConfig);
+            }
+            slot.clearTargeting();
+            if (ad.targeting) {
+                slot.updateTargetingFromMap(ad.targeting);
+            }
+            if (ad.collapseEmptyDiv instanceof Array) {
+                slot.setCollapseEmptyDiv(ad.collapseEmptyDiv[0], ad.collapseEmptyDiv[1]);
+            }
+            else if (typeof ad.collapseEmptyDiv === 'boolean') {
+                slot.setCollapseEmptyDiv(ad.collapseEmptyDiv);
+            }
+            if (ad.clickUrl) {
+                slot.setClickUrl(ad.clickUrl);
+            }
+            if (ad.adsense) {
+                for (const key in ad.adsense) {
+                    slot.set(key, ad.adsense[key]);
+                }
+            }
+            slot.addService(googletag.pubads());
+            googletag.enableServices();
+        }
+        return slot;
     }
+    display(slot) {
+        if (googletag.pubads().isSRA()) {
+            this.$singleRequest.next(new DisplaySlot(slot));
+        }
+        else {
+            googletag.display(slot);
+        }
+    }
+    refresh(slot) {
+        if (googletag.pubads().isSRA()) {
+            this.$singleRequest.next(new RefreshSlot(slot));
+        }
+        else {
+            googletag.pubads().refresh([slot]);
+        }
+    }
+    destroy(slot) {
+        googletag.destroySlots([slot]);
+    }
+    /**
+     * Get the slot by element id
+     * @param elementId the slot element id
+     * @returns
+     */
+    getSlot(elementId) {
+        return this.getSlots().find((slot) => elementId === slot.getSlotElementId());
+    }
+    /**
+     * Get the list of slots associated with this service.
+     * @param elementIds the slot element id array.
+     * @returns
+     */
+    getSlots(elementIds) {
+        let slots = googletag.pubads().getSlots();
+        if (typeof elementIds !== 'undefined') {
+            slots = slots.filter((slot) => elementIds.indexOf(slot.getSlotElementId()) != -1);
+        }
+        return slots;
+    }
+    /**
+     * Use googletag.cmd.push() to execute the callback function.
+     * @param callback
+     */
     cmd(callback) {
         if (isPlatformBrowser(this.platformId)) {
             googletag.cmd.push(callback);
         }
     }
-    destroySlots(elementIds) {
-        this.cmd(() => {
-            googletag.destroySlots(this.getSlots(elementIds));
-        });
-    }
-    getSlots(elementIds) {
-        let slots = undefined;
-        if (isPlatformBrowser(this.platformId)) {
-            if (googletag.apiReady && elementIds) {
-                return googletag
-                    .pubads()
-                    .getSlots()
-                    .filter((slot) => {
-                    return elementIds.indexOf(slot.getSlotElementId()) !== -1;
-                });
-            }
-        }
-        return slots;
-    }
-    refresh(elementIds, opt_options) {
-        this.cmd(() => {
-            googletag.pubads().refresh(this.getSlots(elementIds), opt_options);
-        });
-    }
-    queue(event) {
-        this.$queue.next(event);
-    }
-    /**
-     * Append Script tag to parentNode
-     * @param options
-     * @param parentNode The default setting is document.head
-     * @returns
-     */
     appendScript(options, parentNode) {
         parentNode = parentNode || this.document.head;
         const oldScript = options.id
             ? parentNode.querySelector('#' + options.id)
             : null;
         const script = this.document.createElement('script');
-        Object.assign(script, options, {
-            type: 'text/javascript',
-        });
+        Object.assign(script, options, { type: 'text/javascript' });
         if (oldScript) {
             parentNode.replaceChild(script, oldScript);
         }
@@ -189,20 +255,11 @@ class DfpAdDirective {
         this.viewContainer = viewContainer;
         this.templateRef = templateRef;
         this.dfp = dfp;
+        this.router = router;
         this.$destroy = new Subject();
         this.$update = new Subject();
         if (isPlatformBrowser(platformId)) {
-            this.$update
-                .pipe(switchMap(() => timer(DELAY_TIME)), takeUntil(this.$destroy))
-                .subscribe(() => {
-                this.dfp.cmd(() => this.display());
-            });
-            router &&
-                router.events
-                    .pipe(filter((event) => event instanceof NavigationEnd), takeUntil(this.$destroy))
-                    .subscribe((e) => {
-                    this.$update.next();
-                });
+            this.init();
         }
     }
     set dfpAd(dfpAd) {
@@ -213,29 +270,61 @@ class DfpAdDirective {
             Object.assign(this, dfpAd);
         }
     }
+    init() {
+        this.$update
+            .pipe(switchMap(() => timer(DELAY_TIME)), takeUntil(this.$destroy))
+            .subscribe(() => {
+            this.dfp.cmd(() => this.display());
+        });
+        this.router &&
+            this.router.events
+                .pipe(filter((event) => event instanceof NavigationEnd), takeUntil(this.$destroy))
+                .subscribe(() => {
+                this.$update.next();
+            });
+    }
+    create() {
+        if (this.unitPath) {
+            if (!this.element) {
+                const view = this.viewContainer.createEmbeddedView(this.templateRef);
+                this.element = view.rootNodes[0];
+            }
+            this.$update.next();
+        }
+        else {
+            this.clear();
+        }
+    }
     display() {
-        var _a, _b, _c;
-        if ((_b = (_a = this.element) === null || _a === void 0 ? void 0 : _a.innerText) === null || _b === void 0 ? void 0 : _b.match(/\S+/)) {
+        var _a, _b;
+        if (!this.element || ((_b = (_a = this.element) === null || _a === void 0 ? void 0 : _a.innerText) === null || _b === void 0 ? void 0 : _b.match(/\S+/))) {
             return;
         }
-        if (this.slot && this.id === ((_c = this.element) === null || _c === void 0 ? void 0 : _c.id)) {
-            this.settings(this.slot);
-            this.dfp.queue(new DfpAdRefresh(this.slot));
+        if (this.slot && this.id === this.element.id) {
+            this.dfp.define(Object.assign({}, this));
+            this.dfp.refresh(this.slot);
         }
         else {
             this.destroy();
-            if ((this.slot = this.define())) {
-                googletag.enableServices();
-                if (this.size && this.content) {
-                    googletag.content().setContent(this.slot, this.content);
-                }
-                else {
-                    this.dfp.queue(new DfpAdDisplay(this.slot));
-                }
+            const id = this.element.id || this.id;
+            if ((this.slot = this.dfp.define(Object.assign({}, this, { id: id })))) {
+                this.id = this.element.id = id || this.slot.getSlotElementId();
+                this.dfp.display(this.slot);
             }
             else {
                 this.clear();
             }
+        }
+    }
+    clear() {
+        this.viewContainer.clear();
+        this.element = undefined;
+        this.destroy();
+    }
+    destroy() {
+        if (this.slot) {
+            this.dfp.destroy(this.slot);
+            this.slot = undefined;
         }
     }
     ngDoCheck() {
@@ -256,90 +345,6 @@ class DfpAdDirective {
     ngOnDestroy() {
         this.$destroy.next();
         this.clear();
-    }
-    create() {
-        if (this.unitPath) {
-            if (!this.element) {
-                const view = this.viewContainer.createEmbeddedView(this.templateRef);
-                this.element = view.rootNodes[0];
-            }
-            this.$update.next();
-        }
-        else {
-            this.clear();
-        }
-    }
-    clear() {
-        this.viewContainer.clear();
-        this.element = undefined;
-        this.destroy();
-    }
-    define() {
-        var _a;
-        let slot;
-        const id = ((_a = this.element) === null || _a === void 0 ? void 0 : _a.id) || this.id || '';
-        if (this.size) {
-            slot = googletag.defineSlot(this.unitPath, this.size, id);
-        }
-        else {
-            slot = googletag.defineOutOfPageSlot(this.unitPath, id);
-        }
-        if (slot && this.element) {
-            this.id = this.element.id = id || slot.getSlotElementId();
-            return this.settings(slot);
-        }
-        return;
-    }
-    destroy() {
-        if (this.slot) {
-            googletag.destroySlots([this.slot]);
-            this.slot = undefined;
-        }
-    }
-    settings(slot) {
-        if (this.size && this.content) {
-            slot.addService(googletag.content());
-        }
-        else {
-            if (this.sizeMapping) {
-                slot.defineSizeMapping(this.sizeMapping);
-            }
-            slot.clearCategoryExclusions();
-            if (this.categoryExclusion) {
-                if (this.categoryExclusion instanceof Array) {
-                    this.categoryExclusion.forEach((cat) => slot.setCategoryExclusion(cat));
-                }
-                else {
-                    slot.setCategoryExclusion(this.categoryExclusion);
-                }
-            }
-            if (typeof this.forceSafeFrame === 'boolean') {
-                slot.setForceSafeFrame(this.forceSafeFrame);
-            }
-            if (this.safeFrameConfig) {
-                slot.setSafeFrameConfig(this.safeFrameConfig);
-            }
-            slot.clearTargeting();
-            if (this.targeting) {
-                slot.updateTargetingFromMap(this.targeting);
-            }
-            if (this.collapseEmptyDiv instanceof Array) {
-                slot.setCollapseEmptyDiv(this.collapseEmptyDiv[0], this.collapseEmptyDiv[1]);
-            }
-            else if (typeof this.collapseEmptyDiv === 'boolean') {
-                slot.setCollapseEmptyDiv(this.collapseEmptyDiv);
-            }
-            if (this.clickUrl) {
-                slot.setClickUrl(this.clickUrl);
-            }
-            if (this.adsense) {
-                for (const key in this.adsense) {
-                    slot.set(key, this.adsense[key]);
-                }
-            }
-            slot.addService(googletag.pubads());
-        }
-        return slot;
     }
 }
 DfpAdDirective.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "12.1.1", ngImport: i0, type: DfpAdDirective, deps: [{ token: i0.ViewContainerRef }, { token: i0.TemplateRef }, { token: DfpService }, { token: i2.Router, optional: true }, { token: PLATFORM_ID }], target: i0.ɵɵFactoryTarget.Directive });

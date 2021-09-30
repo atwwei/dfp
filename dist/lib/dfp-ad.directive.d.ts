@@ -8,6 +8,7 @@ export declare class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
     private viewContainer;
     private templateRef;
     private dfp;
+    private router;
     private $destroy;
     private $update;
     private element?;
@@ -26,15 +27,14 @@ export declare class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
     adsense?: Record<string, string>;
     content?: string;
     constructor(viewContainer: ViewContainerRef, templateRef: TemplateRef<unknown>, dfp: DfpService, router: Router, platformId: Object);
+    private init;
+    create(): void;
     display(): void;
+    clear(): void;
+    destroy(): void;
     ngDoCheck(): void;
     ngOnChanges(changes: SimpleChanges): void;
     ngOnDestroy(): void;
-    private create;
-    private clear;
-    private define;
-    private destroy;
-    private settings;
     static ɵfac: i0.ɵɵFactoryDeclaration<DfpAdDirective, [null, null, null, { optional: true; }, null]>;
     static ɵdir: i0.ɵɵDirectiveDeclaration<DfpAdDirective, "[dfpAd]", never, { "dfpAd": "dfpAd"; "id": "dfpAdId"; "size": "dfpAdSize"; "sizeMapping": "dfpAdSizeMapping"; "categoryExclusion": "dfpAdCategoryExclusion"; "clickUrl": "dfpAdClickUrl"; "collapseEmptyDiv": "dfpAdCollapseEmptyDiv"; "forceSafeFrame": "dfpAdForceSafeFrame"; "safeFrameConfig": "dfpAdSafeFrameConfig"; "targeting": "dfpAdTargeting"; "adsense": "dfpAdAdsense"; "content": "dfpAdContent"; }, {}, never>;
 }
