@@ -1,0 +1,78 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@4.7.0
+  browser-tools: circleci/browser-tools@1.2.2
+  coveralls: coveralls/coveralls@1.0.6
+  github-cli: circleci/github-cli@1.0.4
+
+executors:
+  docker:
+    docker:
+      - image: 'circleci/node:12.19-browsers'
+
+jobs:
+  test:
+    executor: docker
+    steps:
+      - checkout
+      - node/install-packages
+      - browser-tools/install-chrome
+      - browser-tools/install-chromedriver
+      - run:
+          name: 'Checking source with eslint and prettier'
+          command: |
+            npm run lint
+            npm run prettier
+      - run:
+          name: 'Run unit test'
+          command: |
+            npm run test
+      - coveralls/upload
+
+  publish:
+    executor: docker
+    steps:
+      - checkout
+      - node/install-packages
+      - run:
+          name: 'User identity'
+          command: |
+            git config --global user.email "atwwei@gmail.com"
+            git config --global user.name "circleci"
+            git remote set-url origin https://$GITHUB_TOKEN@github.com/atwwei/dfp
+            echo //registry.npmjs.org/:_authToken=$NPM_TOKEN >> ~/.npmrc
+      - run:
+          name: 'Run publish'
+          command: |
+            config=./package.json
+            pkg=`grep -o -m 1 'name.*' $config | awk 'BEGIN{FS="\""} {print $3}'`
+            version=`grep -o -m 1 'version.*' $config | awk 'BEGIN{FS="\""} {print $3}'`
+
+            versions=`npm view $pkg@~$version version | xargs`
+            if [[ $versions ]]; then
+              latest=${versions##* };
+              if [[ $latest > $version || $latest = $version ]]; then
+                version=$(echo $latest | awk -F"." '{$NF+=1}{print $0RT}' OFS="." ORS="")
+                npm --no-git-tag-version version $version
+              fi
+            fi
+
+            git tag -a v$version -m "Publish $pkg@$version"
+
+            npm run build
+            npm publish dist --access public
+
+            git push --tags
+
+workflows:
+  dfp:
+    jobs:
+      - test
+      - publish:
+          requires:
+            - test
+          filters:
+            branches:
+              only:
+                - main

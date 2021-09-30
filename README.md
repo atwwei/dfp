@@ -4,6 +4,8 @@
 
 This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version **12.0.4**.
 
+[![CircleCI](https://img.shields.io/circleci/build/github/atwwei/dfp)](https://circleci.com/gh/atwwei/dfp)
+[![Coverage Status](https://coveralls.io/repos/github/atwwei/dfp/badge.svg)](https://coveralls.io/github/atwwei/dfp)
 [![version](https://badge.fury.io/js/@wwei%2Fdfp.svg)](https://www.npmjs.com/package/@wwei/dfp)
 [![ngx-dfp](https://img.shields.io/badge/angular6-ngx--dfp-red.svg)](https://www.npmjs.com/package/ngx-dfp)
 [![license](https://img.shields.io/npm/l/express.svg?style=flat-square)](https://github.com/atwwei/dfp/blob/master/LICENSE)
