@@ -1,12 +1,12 @@
-class DfpAction {
+class SlotRequest {
   slot: googletag.Slot;
   constructor(slot: googletag.Slot) {
     this.slot = slot;
   }
 }
 
-export class DfpAdDisplay extends DfpAction {}
+export class DisplaySlot extends SlotRequest {}
 
-export class DfpAdRefresh extends DfpAction {}
+export class RefreshSlot extends SlotRequest {}
 
-export type Action = DfpAdDisplay | DfpAdRefresh;
+export type Request = DisplaySlot | RefreshSlot;

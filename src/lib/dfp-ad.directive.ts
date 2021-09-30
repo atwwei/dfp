@@ -14,12 +14,12 @@ import {
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
+
 import { Subject, timer } from 'rxjs';
 import { filter, switchMap, takeUntil } from 'rxjs/operators';
 
 import { DELAY_TIME } from './consts';
 import { DfpService } from './dfp.service';
-import { DfpAdDisplay, DfpAdRefresh } from './actions';
 import { DfpAd } from './types';
 
 @Directive({
@@ -57,51 +57,74 @@ export class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
     private viewContainer: ViewContainerRef,
     private templateRef: TemplateRef<unknown>,
     private dfp: DfpService,
-    @Optional() router: Router,
+    @Optional() private router: Router,
     @Inject(PLATFORM_ID) platformId: Object,
   ) {
     if (isPlatformBrowser(platformId)) {
-      this.$update
+      this.init();
+    }
+  }
+
+  private init(): void {
+    this.$update
+      .pipe(
+        switchMap(() => timer(DELAY_TIME)),
+        takeUntil(this.$destroy),
+      )
+      .subscribe(() => {
+        this.dfp.cmd(() => this.display());
+      });
+
+    this.router &&
+      this.router.events
         .pipe(
-          switchMap(() => timer(DELAY_TIME)),
+          filter((event) => event instanceof NavigationEnd),
           takeUntil(this.$destroy),
         )
         .subscribe(() => {
-          this.dfp.cmd(() => this.display());
+          this.$update.next();
         });
+  }
 
-      router &&
-        router.events
-          .pipe(
-            filter((event) => event instanceof NavigationEnd),
-            takeUntil(this.$destroy),
-          )
-          .subscribe((e) => {
-            this.$update.next();
-          });
+  create(): void {
+    if (this.unitPath) {
+      if (!this.element) {
+        const view = this.viewContainer.createEmbeddedView(this.templateRef);
+        this.element = view.rootNodes[0];
+      }
+      this.$update.next();
+    } else {
+      this.clear();
     }
   }
 
   display(): void {
-    if (this.element?.innerText?.match(/\S+/)) {
+    if (!this.element || this.element?.innerText?.match(/\S+/)) {
       return;
     }
 
-    if (this.slot && this.id === this.element?.id) {
-      this.settings(this.slot);
-      this.dfp.queue(new DfpAdRefresh(this.slot));
+    if (this.slot && this.id === this.element.id) {
+      this.dfp.define(this, this.slot);
+      this.dfp.refresh(this.slot);
     } else {
       this.destroy();
-      if ((this.slot = this.define())) {
-        googletag.enableServices();
-        if (this.size && this.content) {
-          googletag.content().setContent(this.slot, this.content);
-        } else {
-          this.dfp.queue(new DfpAdDisplay(this.slot));
-        }
-      } else {
-        this.clear();
-      }
+      const id = this.element.id || this.id;
+      this.slot = this.dfp.define(Object.assign({}, this, { id: id }));
+      this.id = this.element.id = id || this.slot.getSlotElementId();
+      this.dfp.display(this.slot);
+    }
+  }
+
+  clear(): void {
+    this.viewContainer.clear();
+    this.element = undefined;
+    this.destroy();
+  }
+
+  destroy(): void {
+    if (this.slot) {
+      this.dfp.destroy(this.slot);
+      this.slot = undefined;
     }
   }
 
@@ -124,101 +147,5 @@ export class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
   ngOnDestroy(): void {
     this.$destroy.next();
     this.clear();
-  }
-
-  private create(): void {
-    if (this.unitPath) {
-      if (!this.element) {
-        const view = this.viewContainer.createEmbeddedView(this.templateRef);
-        this.element = view.rootNodes[0];
-      }
-      this.$update.next();
-    } else {
-      this.clear();
-    }
-  }
-
-  private clear(): void {
-    this.viewContainer.clear();
-    this.element = undefined;
-    this.destroy();
-  }
-
-  private define(): googletag.Slot | undefined {
-    let slot: googletag.Slot | null;
-    const id = this.element?.id || this.id || '';
-    if (this.size) {
-      slot = googletag.defineSlot(this.unitPath, this.size, id);
-    } else {
-      slot = googletag.defineOutOfPageSlot(this.unitPath, id);
-    }
-    if (slot && this.element) {
-      this.id = this.element.id = id || slot.getSlotElementId();
-      return this.settings(slot);
-    }
-    return;
-  }
-
-  private destroy(): void {
-    if (this.slot) {
-      googletag.destroySlots([this.slot]);
-      this.slot = undefined;
-    }
-  }
-
-  private settings(slot: googletag.Slot): googletag.Slot {
-    if (this.size && this.content) {
-      slot.addService(googletag.content());
-    } else {
-      if (this.sizeMapping) {
-        slot.defineSizeMapping(this.sizeMapping);
-      }
-
-      slot.clearCategoryExclusions();
-      if (this.categoryExclusion) {
-        if (this.categoryExclusion instanceof Array) {
-          this.categoryExclusion.forEach((cat) =>
-            slot.setCategoryExclusion(cat),
-          );
-        } else {
-          slot.setCategoryExclusion(this.categoryExclusion);
-        }
-      }
-
-      if (typeof this.forceSafeFrame === 'boolean') {
-        slot.setForceSafeFrame(this.forceSafeFrame);
-      }
-
-      if (this.safeFrameConfig) {
-        slot.setSafeFrameConfig(this.safeFrameConfig);
-      }
-
-      slot.clearTargeting();
-      if (this.targeting) {
-        slot.updateTargetingFromMap(this.targeting);
-      }
-
-      if (this.collapseEmptyDiv instanceof Array) {
-        slot.setCollapseEmptyDiv(
-          this.collapseEmptyDiv[0],
-          this.collapseEmptyDiv[1],
-        );
-      } else if (typeof this.collapseEmptyDiv === 'boolean') {
-        slot.setCollapseEmptyDiv(this.collapseEmptyDiv);
-      }
-
-      if (this.clickUrl) {
-        slot.setClickUrl(this.clickUrl);
-      }
-
-      if (this.adsense) {
-        for (const key in this.adsense) {
-          slot.set(key, this.adsense[key]);
-        }
-      }
-
-      slot.addService(googletag.pubads());
-    }
-    return slot;
   }
 }
