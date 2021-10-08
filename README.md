@@ -124,9 +124,8 @@ _The following settings can override the above settings with the same name._
 
 ## Links
 
-|                       |                                             |
+| Name                  | URL                                         |
 | :-------------------- | :------------------------------------------ |
 | Online Examples       | https://atwwei.github.io/dfp                |
 | For Angular6          | https://www.npmjs.com/package/ngx-dfp       |
 | Google Publisher Tags | https://developers.google.com/publisher-tag |
-|                       |                                             |

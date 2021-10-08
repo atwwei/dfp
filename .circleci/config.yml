@@ -13,13 +13,20 @@ executors:
       - image: 'circleci/node:12.19-browsers'
 
 jobs:
-  test:
+  build:
     executor: docker
     steps:
       - checkout
       - node/install-packages
       - browser-tools/install-chrome
       - browser-tools/install-chromedriver
+      - run:
+          name: 'User identity'
+          command: |
+            git config --global user.email "atwwei@gmail.com"
+            git config --global user.name "circleci"
+            git remote set-url origin https://$GITHUB_TOKEN@github.com/atwwei/dfp
+            echo //registry.npmjs.org/:_authToken=$NPM_TOKEN >> ~/.npmrc
       - run:
           name: 'Checking source with eslint and prettier'
           command: |
@@ -29,24 +36,6 @@ jobs:
           name: 'Run unit test'
           command: |
             npm run test
-      - when:
-          condition:
-            equal: [main, << pipeline.git.branch >>]
-          steps:
-            - coveralls/upload
-
-  publish:
-    executor: docker
-    steps:
-      - checkout
-      - node/install-packages
-      - run:
-          name: 'User identity'
-          command: |
-            git config --global user.email "atwwei@gmail.com"
-            git config --global user.name "circleci"
-            git remote set-url origin https://$GITHUB_TOKEN@github.com/atwwei/dfp
-            echo //registry.npmjs.org/:_authToken=$NPM_TOKEN >> ~/.npmrc
       - run:
           name: 'Run build'
           command: |
@@ -66,25 +55,24 @@ jobs:
             git tag -a v$version -m "Publish $pkg@$version"
 
             npm run build
-      - run:
-          name: 'Run publish'
-          command: |
-            if [[ $CIRCLE_BRANCH = "main" ]]; then
-              npm publish dist --access public
-            else
-              npm publish dist --access public --tag $CIRCLE_BRANCH
-            fi
-            git push --tags
+      - when:
+          condition:
+            matches:
+              pattern: '^(main|v\d+-lts)$'
+              value: << pipeline.git.branch >>
+          steps:
+            - coveralls/upload
+            - run:
+                name: 'Run publish'
+                command: |
+                  if [[ $CIRCLE_BRANCH = "main" ]]; then
+                    npm publish dist --access public
+                  else
+                    npm publish dist --access public --tag $CIRCLE_BRANCH
+                  fi
+                  git push --tags
 
 workflows:
   dfp:
     jobs:
-      - test
-      - publish:
-          requires:
-            - test
-          filters:
-            branches:
-              only:
-                - main
-                - /v\d+-lts/
+      - build
