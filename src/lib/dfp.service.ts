@@ -28,7 +28,7 @@ export class DfpService {
   }
 
   constructor(
-    @Inject(PLATFORM_ID) private platformId: Record<string, unknown>,
+    @Inject(PLATFORM_ID) private platformId: Object,
     @Inject(DOCUMENT) private document: Document,
   ) {
     if (isPlatformBrowser(this.platformId)) {
@@ -40,7 +40,7 @@ export class DfpService {
     // GPT
     if (!window.googletag) {
       this.appendScript({ async: true, src: GPT_SOURCE });
-      window.googletag = window.googletag || { cmd: [] };
+      (window as any).googletag = window.googletag || { cmd: [] };
     }
     // Single Request Queue
     this.$singleRequest

@@ -7,7 +7,6 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
 [![CircleCI](https://img.shields.io/circleci/build/github/atwwei/dfp)](https://circleci.com/gh/atwwei/dfp)
 [![Coverage Status](https://coveralls.io/repos/github/atwwei/dfp/badge.svg)](https://coveralls.io/github/atwwei/dfp)
 [![version](https://badge.fury.io/js/@wwei%2Fdfp.svg)](https://www.npmjs.com/package/@wwei/dfp)
-[![ngx-dfp](https://img.shields.io/badge/angular6-ngx--dfp-red.svg)](https://www.npmjs.com/package/ngx-dfp)
 [![license](https://img.shields.io/npm/l/express.svg?style=flat-square)](https://github.com/atwwei/dfp/blob/master/LICENSE)
 
 ## Usage
@@ -19,8 +18,8 @@ import { DfpModule } from '@wwei/dfp';
 
 @NgModule({
   imports: [
-    DfpModule,
     ...
+    DfpModule,
   ],
   ...
 })
@@ -28,7 +27,7 @@ export class AppModule {}
 ...
 ```
 
-Use [googletag](https://www.npmjs.com/package/@types/googletag) to customize page-level settings before the service is enabled.
+Use [googletag.PubAdsService](https://developers.google.com/publisher-tag/reference#googletag.pubadsservice) to customize page-level settings before the service is enabled.
 
 ```
 import { DfpService } from '@wwei/dfp';
@@ -54,13 +53,25 @@ Use `DfpAdDirective` in angular templates to define and display advertisements.
 ```
 <div
   *dfpAd="{
-    unitPath: '/6355419/Travel',
+    unitPath: '/6355419/Travel/Europe',
     id: 'ad-div-id',
-    size: [728, 90],
+    size: [
+      [300, 250],
+      [728, 90],
+      [750, 200]
+    ],
     sizeMapping: [
-      [[1024, 768], [970, 250]],
-      [[980, 690], 'fluid'],
-      [[640, 480], [120, 60]],
+      [
+        [750, 0],
+        [
+          [750, 200],
+          [728, 90]
+        ]
+      ],
+      [
+        [300, 0],
+        [300, 250]
+      ],
       [[0, 0], []]
     ],
     categoryExclusion: 'AirlineAd',
@@ -69,8 +80,7 @@ Use `DfpAdDirective` in angular templates to define and display advertisements.
     forceSafeFrame: true,
     safeFrameConfig: { sandbox: true },
     targeting: { test: 'refresh' },
-    adsense: { adsense_test_mode: 'on' },
-    content: 'Set the content manually'
+    adsense: { adsense_test_mode: 'on' }
   }"
 ></div>
 ```
@@ -80,13 +90,25 @@ _The following settings can override the above settings with the same name._
 ```
 <div
   *dfpAd="
-    '/6355419/Travel';
+    '/6355419/Travel/Europe';
     id: 'ad-div-id';
-    size: [728, 90];
+    size: [
+      [300, 250],
+      [728, 90],
+      [750, 200]
+    ];
     sizeMapping: [
-      [[1024, 768], [970, 250]],
-      [[980, 690], 'fluid'],
-      [[640, 480], [120, 60]],
+      [
+        [750, 0],
+        [
+          [750, 200],
+          [728, 90]
+        ]
+      ],
+      [
+        [300, 0],
+        [300, 250]
+      ],
       [[0, 0], []]
     ];
     categoryExclusion: 'AirlineAd';
@@ -96,11 +118,15 @@ _The following settings can override the above settings with the same name._
     safeFrameConfig: { sandbox: true };
     targeting: { test: 'refresh' };
     adsense: { adsense_test_mode: 'on' };
-    content: 'Set the content manually';
   "
 ></div>
 ```
 
-## Online Examples
+## Links
 
-https://atwwei.github.io/dfp
+|                       |                                             |
+| :-------------------- | :------------------------------------------ |
+| Online Examples       | https://atwwei.github.io/dfp                |
+| For Angular6          | https://www.npmjs.com/package/ngx-dfp       |
+| Google Publisher Tags | https://developers.google.com/publisher-tag |
+|                       |                                             |
