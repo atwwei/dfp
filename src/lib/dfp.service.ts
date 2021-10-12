@@ -83,7 +83,7 @@ export class DfpService {
   }
 
   define(ad: DfpAd, slot?: googletag.Slot): googletag.Slot {
-    let id = ad.id + '';
+    let id = String(ad.id);
 
     if (!slot) {
       const exists = this.getSlot(id);
@@ -177,7 +177,7 @@ export class DfpService {
     let slots: googletag.Slot[] = googletag.pubads().getSlots();
     return slots.filter(
       (slot) =>
-        !elementIds || elementIds.indexOf(slot.getSlotElementId()) != -1,
+        !elementIds || elementIds.indexOf(slot.getSlotElementId()) !== -1,
     );
   }
 
