@@ -110,7 +110,8 @@ export class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
       this.destroy();
       const id = this.element.id || this.id;
       this.slot = this.dfp.define(Object.assign({}, this, { id: id }));
-      this.id = this.element.id = id || this.slot.getSlotElementId();
+      this.element.id = id || this.slot.getSlotElementId();
+      this.id = this.element.id;
       this.dfp.display(this.slot);
     }
   }

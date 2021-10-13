@@ -1,18 +1,34 @@
+// Eslint Rules：https://eslint.org/docs/rules/
 {
   "root": true,
   "overrides": [
     {
+      "globals": {
+        "window": true,
+        "document": true,
+        "googletag": true
+      },
       "files": ["*.ts"],
       "parserOptions": {
         "project": ["tsconfig.json", "e2e/tsconfig.json"],
         "createDefaultProgram": true
       },
       "extends": [
+        "eslint:recommended",
         "plugin:@angular-eslint/recommended",
         "plugin:@angular-eslint/template/process-inline-templates",
         "plugin:prettier/recommended"
       ],
-      "rules": {}
+      "rules": {
+        "eqeqeq": ["error", "always"],
+        "no-confusing-arrow": ["error", { "allowParens": true }],
+        "no-implicit-coercion": "error",
+        "no-multi-assign": "error",
+        "no-template-curly-in-string": "error",
+        "no-unused-vars": ["error", { "args": "none" }],
+        "no-useless-constructor": "error",
+        "no-use-before-define": "error"
+      }
     },
     // NOTE: WE ARE NOT APPLYING PRETTIER IN THIS OVERRIDE, ONLY @ANGULAR-ESLINT/TEMPLATE
     {
