@@ -20,14 +20,14 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test --watch false --code-coverage true",
-    "lint": "eslint --ext .ts,.html .",
-    "lint-fix": "eslint --fix --ext .ts,.html .",
+    "lint": "eslint ./src --format junit --output-file ./reports/eslint.xml",
+    "lint-fix": "eslint --fix ./src",
     "prettier": "prettier --check \"./**/*.{ts,js,json,md,html,scss,yml}\"",
     "prettier-fix": "prettier --write \"./**/*.{ts,js,json,md,html,scss,yml}\"",
     "publish": "npm run build && cd dist && node ../scripts/publish.js"
   },
   "dependencies": {
-    "@types/googletag": "^1.1.0"
+    "@types/googletag": "^1.1.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~12.1.1",
@@ -57,6 +57,7 @@
     "karma-coverage": "~2.0.3",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.5.0",
+    "karma-junit-reporter": "^2.0.1",
     "ng-packagr": "^12.0.0",
     "prettier": "^2.3.2",
     "rxjs": "~6.6.0",
