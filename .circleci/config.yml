@@ -10,7 +10,7 @@ orbs:
 executors:
   docker:
     docker:
-      - image: 'circleci/node:12.19-browsers'
+      - image: circleci/node:12.19-browsers
 
 jobs:
   build:
@@ -21,23 +21,23 @@ jobs:
       - browser-tools/install-chrome
       - browser-tools/install-chromedriver
       - run:
-          name: 'User identity'
+          name: User identity
           command: |
             git config --global user.email "atwwei@gmail.com"
             git config --global user.name "circleci"
             git remote set-url origin https://$GITHUB_TOKEN@github.com/atwwei/dfp
             echo //registry.npmjs.org/:_authToken=$NPM_TOKEN >> ~/.npmrc
       - run:
-          name: 'Checking source with eslint and prettier'
-          command: |
-            npm run lint
-            npm run prettier
+          name: Run prettier
+          command: npm run prettier
       - run:
-          name: 'Run unit test'
-          command: |
-            npm run test
+          name: Run eslint
+          command: npm run lint
       - run:
-          name: 'Run build'
+          name: Run karma
+          command: npm run test
+      - run:
+          name: Run build
           command: |
             config=./package.json
             pkg=`grep -o -m 1 'name.*' $config | awk 'BEGIN{FS="\""} {print $3}'`
@@ -55,15 +55,21 @@ jobs:
             git tag -a v$version -m "Publish $pkg@$version"
 
             npm run build
+      - store_test_results:
+          path: reports
+      - store_artifacts:
+          path: reports
+      - store_artifacts:
+          path: coverage
       - when:
           condition:
             matches:
-              pattern: '^(main|v\d+-lts)$'
+              pattern: ^(main|v\d+-lts)$
               value: << pipeline.git.branch >>
           steps:
             - coveralls/upload
             - run:
-                name: 'Run publish'
+                name: Run publish
                 command: |
                   if [[ $CIRCLE_BRANCH = "main" ]]; then
                     npm publish dist --access public
