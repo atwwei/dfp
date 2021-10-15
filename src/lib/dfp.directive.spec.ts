@@ -31,7 +31,7 @@ describe('DfpAdDirective', () => {
       schemas: [NO_ERRORS_SCHEMA],
     });
 
-    service = TestBed.inject(DfpService);
+    service = TestBed.get(DfpService);
     fixture = TestBed.createComponent(TestComponent);
     component = fixture.componentInstance;
 
@@ -41,7 +41,7 @@ describe('DfpAdDirective', () => {
       service.cmd(() => {
         googletag
           .defineSlot(dfpAd.unitPath, [1, 1], 'dfp-ad-1')
-          ?.addService(googletag.pubads());
+          .addService(googletag.pubads());
         googletag.pubads().enableSingleRequest();
       });
     }
@@ -77,9 +77,11 @@ describe('DfpAdDirective', () => {
     ).nativeElement;
     expect(dfpad3.innerHTML).toBe('DFP AD CONTENT');
 
-    expect(
-      service.getSlot(component.outOfPage?.id || '')?.getOutOfPage(),
-    ).toBeTrue();
+    const slot = service.getSlot(
+      component.outOfPage ? component.outOfPage.id || '' : '',
+    ) as googletag.Slot;
+    expect(slot).toBeTruthy();
+    expect(slot.getOutOfPage()).toBeTrue();
 
     component.outOfPage = undefined;
   });
@@ -88,8 +90,9 @@ describe('DfpAdDirective', () => {
     component.targeting = undefined;
 
     const oldId1 = component.id1;
-    expect(service.getSlot(oldId1)).toBeDefined();
-    expect(service.getSlot(oldId1)?.getTargeting('test')).toEqual(['refresh']);
+    const slot = service.getSlot(oldId1) as googletag.Slot;
+    expect(slot).toBeDefined();
+    expect(slot.getTargeting('test')).toEqual(['refresh']);
 
     const id = (component.id = 'dfp-ad-changed');
     const id1 = (component.id1 += '-changed');
@@ -114,14 +117,16 @@ describe('DfpAdDirective', () => {
         expect(ids).not.toContain(oldId1);
         expect(ids).toContain(id1);
 
-        expect(service.getSlot(id1)?.getTargeting('test')).toEqual([]);
+        const slot = service.getSlot(id1) as googletag.Slot;
+        expect(slot).toBeDefined();
+        expect(slot.getTargeting('test')).toEqual([]);
 
         done();
       });
   });
 
   it('Ad slot should be refreshed after navigated', (done: DoneFn) => {
-    const router = TestBed.inject(Router);
+    const router = TestBed.get(Router);
 
     googletag.pubads().clear();
 
@@ -146,9 +151,6 @@ describe('DfpAdDirective', () => {
     fixture.destroy();
 
     expect(service.getSlots().length).toBe(0);
-
-    const dfpads = fixture.debugElement.queryAll(By.css('.dfp-ad'));
-    dfpads.forEach((ad) => expect(ad.nativeElement.innerHTML).toBeFalsy());
   });
 
   it('Tags should be append', () => {

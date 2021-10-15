@@ -38,9 +38,9 @@ export class DfpService {
 
   private init(): void {
     // GPT
-    if (!window.googletag) {
+    if (!(window as any).googletag) {
       this.appendScript({ async: true, src: GPT_SOURCE });
-      (window as any).googletag = window.googletag || { cmd: [] };
+      (window as any).googletag = (window as any).googletag || { cmd: [] };
     }
     // Single Request Queue
     this.$singleRequest

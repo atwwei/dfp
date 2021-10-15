@@ -19,8 +19,8 @@ describe('DfpAdDirective (Server Side)', () => {
       schemas: [NO_ERRORS_SCHEMA],
     });
 
-    service = TestBed.inject(DfpService);
-    platform = TestBed.inject(PLATFORM_ID);
+    service = TestBed.get(DfpService);
+    platform = TestBed.get(PLATFORM_ID);
 
     fixture = TestBed.createComponent(TestComponent);
     component = fixture.componentInstance;

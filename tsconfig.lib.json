@@ -5,10 +5,16 @@
     "outDir": "./out-tsc/lib",
     "target": "es2015",
     "declaration": true,
-    "declarationMap": true,
     "inlineSources": true,
     "types": ["googletag"],
     "lib": ["dom", "es2018"]
+  },
+  "angularCompilerOptions": {
+    "annotateForClosureCompiler": true,
+    "skipTemplateCodegen": true,
+    "fullTemplateTypeCheck": true,
+    "strictInjectionParameters": true,
+    "enableResourceInlining": true
   },
   "exclude": ["src/test.ts", "**/*.spec.ts"]
 }
