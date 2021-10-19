@@ -99,7 +99,7 @@ export class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
   }
 
   display(): void {
-    if (!this.element || this.element?.innerText?.match(/\S+/)) {
+    if (!this.element || this.element.innerText.match(/\S+/)) {
       return;
     }
 
@@ -130,7 +130,7 @@ export class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
   }
 
   ngDoCheck(): void {
-    if (this.element?.id && this.id !== this.element.id) {
+    if (this.element && this.element.id && this.id !== this.element.id) {
       this.id = this.element.id;
       this.destroy();
       this.create();
