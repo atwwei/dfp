@@ -83,7 +83,7 @@ export class DfpService {
   }
 
   define(ad: DfpAd, slot?: googletag.Slot): googletag.Slot {
-    let id = String(ad.id);
+    let id = ad.id || '';
 
     if (!slot) {
       const exists = this.getSlot(id);

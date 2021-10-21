@@ -69,6 +69,9 @@ describe('DfpAdDirective', () => {
     const dfpads = fixture.debugElement.queryAll(By.css('.dfp-ad'));
     dfpads.forEach((ad) => expect(ad.nativeElement.innerHTML).toBeTruthy());
 
+    var gpt_unit_id = dfpads[0].nativeElement.id;
+    expect(gpt_unit_id).toMatch(/^gpt_unit_/);
+
     const dfpad2 = fixture.debugElement.query(By.css('#' + component.id2));
     expect(dfpad2).toBeFalsy();
 
@@ -220,7 +223,7 @@ export class TestComponent {
     targeting: { test: 'outofpage' },
   };
 
-  id = '';
+  id?: string;
   id1 = 'dfp-ad-1';
   id2 = 'dfp-ad-2';
   id3 = 'dfp-ad-3';
