@@ -78,12 +78,20 @@ export class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
     this.router &&
       this.router.events
         .pipe(
-          filter((event) => event instanceof NavigationEnd),
+          filter((event) => event instanceof NavigationEnd && this.isVisible()),
           takeUntil(this.$destroy),
         )
         .subscribe(() => {
           this.$update.next();
         });
+  }
+
+  isVisible(): boolean {
+    if (!this.element || !this.element.parentElement) {
+      return false;
+    }
+    const rect = this.element.parentElement.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
   }
 
   create(): void {
