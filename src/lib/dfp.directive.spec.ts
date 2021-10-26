@@ -213,6 +213,9 @@ const dfpAd: DfpAd = {
     ></div>
     <div *dfpAd="''" [id]="id2"></div>
     <div *dfpAd="dfpAd; id: id3; content: 'DFP AD CONTENT'"></div>
+    <div style="display: none;">
+      <div *dfpAd="dfpAd" id="parent-is-hidden"></div>
+    </div>
     <div *dfpAd="outOfPage"></div>`,
   styles: ['div{height:92px;margin-top:1rem;border:1px solid #ccc}'],
 })
