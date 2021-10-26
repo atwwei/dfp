@@ -50,13 +50,17 @@ export class DfpService {
         ),
       )
       .subscribe((acts) => {
+        const refreshSlots: googletag.Slot[] = [];
         acts.forEach((act) => {
           if (act instanceof DisplaySlot) {
             googletag.display(act.slot);
           } else {
-            googletag.pubads().refresh([act.slot], { changeCorrelator: false });
+            refreshSlots.push(act.slot);
           }
         });
+        if (refreshSlots.length > 0) {
+          googletag.pubads().refresh(refreshSlots);
+        }
       });
     // Event Listeners
     googletag.cmd.push(() => {
