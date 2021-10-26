@@ -78,20 +78,12 @@ export class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
     this.router &&
       this.router.events
         .pipe(
-          filter((event) => event instanceof NavigationEnd && this.isVisible()),
+          filter((event) => event instanceof NavigationEnd),
           takeUntil(this.$destroy),
         )
         .subscribe(() => {
           this.$update.next();
         });
-  }
-
-  isVisible(): boolean {
-    if (!this.element || !this.element.parentElement) {
-      return false;
-    }
-    const rect = this.element.parentElement.getBoundingClientRect();
-    return rect.width > 0 && rect.height > 0;
   }
 
   create(): void {
@@ -107,7 +99,16 @@ export class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
   }
 
   display(): void {
-    if (!this.element || this.element.innerText.match(/\S+/)) {
+    if (
+      !this.element ||
+      !this.element.parentElement ||
+      this.element.innerText.match(/\S+/)
+    ) {
+      return;
+    }
+
+    const rect = this.element.parentElement.getBoundingClientRect();
+    if (rect.width === 0 && rect.height === 0) {
       return;
     }
 
