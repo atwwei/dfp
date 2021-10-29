@@ -84,7 +84,7 @@ describe('DfpAdDirective', () => {
       component.outOfPage ? component.outOfPage.id || '' : '',
     ) as googletag.Slot;
     expect(slot).toBeTruthy();
-    expect(slot.getOutOfPage()).toBeTrue();
+    expect(slot.getOutOfPage()).toBe(true);
 
     component.outOfPage = undefined;
   });

@@ -30,9 +30,9 @@ describe('DfpAdDirective (Server Side)', () => {
 
   it('Simple test', () => {
     expect(platform).toBeDefined();
-    expect(isPlatformServer(platform)).toBeTrue();
+    expect(isPlatformServer(platform)).toBe(true);
 
-    expect(service.cmd(() => {})).toBeFalse();
+    expect(service.cmd(() => {})).toBe(false);
     expect(
       fixture.debugElement.query(By.css('.dfp-ad')).nativeElement.innerHTML,
     ).toBeFalsy();
