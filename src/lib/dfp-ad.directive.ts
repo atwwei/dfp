@@ -99,17 +99,19 @@ export class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
   }
 
   display(): void {
-    if (
-      !this.element ||
-      !this.element.parentElement ||
-      this.element.innerText.match(/\S+/)
-    ) {
+    if (!this.element || this.element.innerText.match(/\S+/)) {
       return;
     }
 
-    const rect = this.element.parentElement.getBoundingClientRect();
-    if (rect.width === 0 && rect.height === 0) {
-      return;
+    let parentElement = this.element.parentElement;
+    while (parentElement) {
+      if (
+        parentElement.style.visibility === 'hidden' ||
+        parentElement.style.display === 'none'
+      ) {
+        return;
+      }
+      parentElement = parentElement.parentElement;
     }
 
     if (this.slot && this.id === this.element.id) {
