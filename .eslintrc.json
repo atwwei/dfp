@@ -45,6 +45,18 @@
         // NOTE: WE ARE OVERRIDING THE DEFAULT CONFIG TO ALWAYS SET THE PARSER TO ANGULAR (SEE BELOW)
         "prettier/prettier": ["error", { "parser": "angular" }]
       }
+    },
+    {
+      "env": {
+        "node": true
+      },
+      "files": ["scripts/*.js"],
+      "extends": ["eslint:recommended", "plugin:prettier/recommended"],
+      "rules": {},
+      "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module"
+      }
     }
   ]
 }

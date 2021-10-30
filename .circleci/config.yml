@@ -39,28 +39,12 @@ jobs:
       - run:
           name: Run build
           command: |
-            config=./package.json
-            pkg=`grep -o -m 1 'name.*' $config | awk 'BEGIN{FS="\""} {print $3}'`
-            version=`grep -o -m 1 'version.*' $config | awk 'BEGIN{FS="\""} {print $3}'`
-
-            versions=`npm view $pkg@~$version version | xargs`
-            if [[ $versions ]]; then
-              latest=${versions##* };
-              if [[ $latest > $version || $latest = $version ]]; then
-                version=$(echo $latest | awk -F"." '{$NF+=1}{print $0RT}' OFS="." ORS="")
-                npm --no-git-tag-version version $version
-              fi
-            fi
-
-            git tag -a v$version -m "Publish $pkg@$version"
-
             npm run build
-      - store_test_results:
-          path: reports
-      - store_artifacts:
-          path: reports
-      - store_artifacts:
-          path: coverage
+            config=dist/package.json
+            name=`grep -o -m 1 'name.*' $config | awk 'BEGIN{FS="\""} {print $3}'`
+            version=`grep -o -m 1 'version.*' $config | awk 'BEGIN{FS="\""} {print $3}'`
+            echo Add git tag v$version
+            git tag -a v$version -m "Publish $name@$version"
       - when:
           condition:
             matches:
@@ -77,7 +61,12 @@ jobs:
                     npm publish dist --access public --tag $CIRCLE_BRANCH
                   fi
                   git push --tags
-
+      - store_test_results:
+          path: reports
+      - store_artifacts:
+          path: dist
+      - store_artifacts:
+          path: coverage
 workflows:
   dfp:
     jobs:
