@@ -4,10 +4,25 @@
 
 This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version **12.0.4**.
 
-[![CircleCI](https://img.shields.io/circleci/build/github/atwwei/dfp)](https://circleci.com/gh/atwwei/dfp)
-[![Coverage Status](https://coveralls.io/repos/github/atwwei/dfp/badge.svg)](https://coveralls.io/github/atwwei/dfp)
-[![version](https://badge.fury.io/js/@wwei%2Fdfp.svg)](https://www.npmjs.com/package/@wwei/dfp)
-[![license](https://img.shields.io/npm/l/express.svg?style=flat-square)](https://github.com/atwwei/dfp/blob/master/LICENSE)
+[![Build Status](https://img.shields.io/circleci/build/github/atwwei/dfp/main)](https://circleci.com/gh/atwwei/dfp/tree/main)
+[![Coverage Status](https://img.shields.io/coveralls/github/atwwei/dfp)](https://coveralls.io/github/atwwei/dfp?branch=main)
+[![NPM Version](https://img.shields.io/npm/v/@wwei/dfp)](https://www.npmjs.com/package/@wwei/dfp)
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
+[![GitHub License](https://img.shields.io/github/license/atwwei/dfp)](https://github.com/atwwei/dfp/blob/master/LICENSE)
+
+## Install
+
+```
+npm install @wwei/dfp@latest
+```
+
+| Angular Version | Install                       |
+| :-------------- | :---------------------------- |
+| 6、7            | npm install @wwei/dfp@v7-lts  |
+| 8               | npm install @wwei/dfp@v8-lts  |
+| 9               | npm install @wwei/dfp@v9-lts  |
+| 10              | npm install @wwei/dfp@v10-lts |
+| 11              | npm install @wwei/dfp@v11-lts |
 
 ## Usage
 
@@ -127,5 +142,8 @@ _The following settings can override the above settings with the same name._
 | Name                  | URL                                         |
 | :-------------------- | :------------------------------------------ |
 | Online Examples       | https://atwwei.github.io/dfp                |
-| For Angular6          | https://www.npmjs.com/package/ngx-dfp       |
 | Google Publisher Tags | https://developers.google.com/publisher-tag |
+
+## License
+
+MIT © [Wei Wang](https://github.com/atwwei)
