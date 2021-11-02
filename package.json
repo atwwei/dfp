@@ -3,6 +3,13 @@
   "description": "Asynchronous rendering ads with Google Publisher Tag (Doubleclick GPT) for Angular",
   "version": "12.3.0",
   "license": "MIT",
+  "homepage": "https://github.com/atwwei/dfp#readme",
+  "keywords": [
+    "angular",
+    "google",
+    "dfp",
+    "ads"
+  ],
   "author": {
     "name": "atwwei",
     "email": "atwwei@gmail.com"
@@ -24,7 +31,7 @@
     "lint-fix": "eslint --fix ./src",
     "prettier": "prettier --check \"./**/*.{ts,js,json,md,html,scss,yml}\"",
     "prettier-fix": "prettier --write \"./**/*.{ts,js,json,md,html,scss,yml}\"",
-    "publish": "npm run build && cd dist && node ../scripts/publish.js"
+    "commit": "git-cz"
   },
   "dependencies": {
     "@types/googletag": "^1.1.2"
@@ -48,6 +55,8 @@
     "@types/node": "^12.11.1",
     "@typescript-eslint/eslint-plugin": "4.28.2",
     "@typescript-eslint/parser": "4.28.2",
+    "commitizen": "^4.2.4",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.26.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
