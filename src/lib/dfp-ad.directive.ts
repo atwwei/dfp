@@ -1,4 +1,3 @@
-/* eslint-disable @angular-eslint/no-conflicting-lifecycle */
 import {
   Directive,
   DoCheck,
@@ -55,7 +54,7 @@ export class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
 
   constructor(
     private viewContainer: ViewContainerRef,
-    private templateRef: TemplateRef<unknown>,
+    private templateRef: TemplateRef<any>,
     private dfp: DfpService,
     @Optional() private router: Router,
     @Inject(PLATFORM_ID) platformId: Object,
