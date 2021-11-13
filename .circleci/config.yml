@@ -10,7 +10,7 @@ orbs:
 executors:
   docker:
     docker:
-      - image: circleci/node:12.19-browsers
+      - image: circleci/node:16.11-browsers
 
 jobs:
   build:
