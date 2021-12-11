@@ -23,6 +23,7 @@ npm install @wwei/dfp@latest
 | 9               | npm install @wwei/dfp@v9-lts  |
 | 10              | npm install @wwei/dfp@v10-lts |
 | 11              | npm install @wwei/dfp@v11-lts |
+| 12              | npm install @wwei/dfp@v12-lts |
 
 ## Usage
 
