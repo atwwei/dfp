@@ -3,12 +3,10 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/lib",
-    "target": "es2015",
     "declaration": true,
     "declarationMap": true,
     "inlineSources": true,
-    "types": ["googletag"],
-    "lib": ["dom", "es2018"]
+    "types": ["googletag"]
   },
   "exclude": ["src/test.ts", "**/*.spec.ts"]
 }

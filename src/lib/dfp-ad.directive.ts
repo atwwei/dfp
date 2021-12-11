@@ -26,8 +26,8 @@ import { DfpAd } from './types';
   selector: '[dfpAd]',
 })
 export class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
-  private $destroy = new Subject();
-  private $update = new Subject();
+  private $destroy = new Subject<void>();
+  private $update = new Subject<void>();
   private element?: HTMLElement;
   private slot?: googletag.Slot;
 
