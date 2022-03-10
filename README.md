@@ -2,13 +2,17 @@
 
 @wwei/dfp is an [angular](https://angular.io) module for displaying google dfp ads using [Google Publisher Tag (Doubleclick GPT)](https://developers.google.com/publisher-tag/reference).
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version **12.0.4**.
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version **13.2.5**.
 
 [![Build Status](https://img.shields.io/circleci/build/github/atwwei/dfp/main)](https://circleci.com/gh/atwwei/dfp/tree/main)
 [![Coverage Status](https://img.shields.io/coveralls/github/atwwei/dfp)](https://coveralls.io/github/atwwei/dfp?branch=main)
 [![NPM Version](https://img.shields.io/npm/v/@wwei/dfp)](https://www.npmjs.com/package/@wwei/dfp)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![GitHub License](https://img.shields.io/github/license/atwwei/dfp)](https://github.com/atwwei/dfp/blob/master/LICENSE)
+
+## Dependencies
+
+[@types/googletag](https://www.npmjs.com/package/@types/googletag)
 
 ## Install
 
