@@ -66,12 +66,17 @@ jobs:
                   fi
                   git push --tags
             - coveralls/upload
+      - run:
+          name: Compress artifacts
+          command: |
+            tar czf dist.tar.gz dist
+            tar czf coverage.tar.gz coverage
       - store_test_results:
           path: reports
       - store_artifacts:
-          path: dist
+          path: coverage.tar.gz
       - store_artifacts:
-          path: coverage
+          path: dist.tar.gz
 workflows:
   dfp:
     jobs:
