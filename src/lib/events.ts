@@ -1,4 +1,4 @@
-class GptEvent {
+export class Event {
   serviceName!: string;
   slot!: googletag.Slot;
   constructor(event: googletag.events.Event) {
@@ -6,33 +6,85 @@ class GptEvent {
   }
 }
 
-export class ImpressionViewableEvent extends GptEvent {}
+export class ImpressionViewableEvent extends Event {}
 
-export class SlotOnloadEvent extends GptEvent {}
+export class RewardedSlotClosedEvent extends Event {}
 
-export class SlotRenderEndedEvent extends GptEvent {
-  advertiserId?: number;
-  campaignId?: number;
-  creativeId?: number;
-  isEmpty!: boolean;
-  lineItemId?: number;
-  size!: googletag.SingleSize;
-  sourceAgnosticCreativeId?: number;
-  sourceAgnosticLineItemId?: number;
+export class RewardedSlotGrantedEvent
+  extends Event
+  implements googletag.events.RewardedSlotGrantedEvent
+{
+  payload!: googletag.RewardedPayload | null;
 }
 
-export class SlotRequestedEvent extends GptEvent {}
+export class RewardedSlotReadyEvent
+  extends Event
+  implements googletag.events.RewardedSlotReadyEvent
+{
+  makeRewardedVisible!: () => void;
+}
 
-export class SlotResponseReceived extends GptEvent {}
+export class SlotOnloadEvent extends Event {}
 
-export class SlotVisibilityChangedEvent extends GptEvent {
+export class SlotRenderEndedEvent
+  extends Event
+  implements googletag.events.SlotRenderEndedEvent
+{
+  advertiserId!: number | null;
+  campaignId!: number | null;
+  creativeId!: number | null;
+  isEmpty!: boolean;
+  lineItemId!: number | null;
+  size!: string | number[] | null;
+  sourceAgnosticCreativeId!: number | null;
+  sourceAgnosticLineItemId!: number | null;
+}
+
+export class SlotRequestedEvent extends Event {}
+
+export class SlotResponseReceived extends Event {}
+
+export class SlotVisibilityChangedEvent
+  extends Event
+  implements googletag.events.SlotVisibilityChangedEvent
+{
   inViewPercentage!: number;
 }
 
-export type Event =
-  | ImpressionViewableEvent
-  | SlotRenderEndedEvent
-  | SlotRequestedEvent
-  | SlotOnloadEvent
-  | SlotResponseReceived
-  | SlotVisibilityChangedEvent;
+export const EVENT_TYPES: googletag.events.EventType[] = [
+  'impressionViewable',
+  'rewardedSlotClosed',
+  'rewardedSlotGranted',
+  'rewardedSlotReady',
+  'slotRequested',
+  'slotResponseReceived',
+  'slotRenderEnded',
+  'slotOnload',
+  'slotVisibilityChanged',
+];
+
+export function eventFactory(
+  type: googletag.events.EventType,
+  event: googletag.events.Event,
+): Event {
+  switch (type) {
+    case 'impressionViewable':
+      return new ImpressionViewableEvent(event);
+    case 'rewardedSlotClosed':
+      return new RewardedSlotClosedEvent(event);
+    case 'rewardedSlotGranted':
+      return new RewardedSlotGrantedEvent(event);
+    case 'rewardedSlotReady':
+      return new RewardedSlotReadyEvent(event);
+    case 'slotRequested':
+      return new SlotRequestedEvent(event);
+    case 'slotResponseReceived':
+      return new SlotResponseReceived(event);
+    case 'slotRenderEnded':
+      return new SlotRenderEndedEvent(event);
+    case 'slotOnload':
+      return new SlotOnloadEvent(event);
+    case 'slotVisibilityChanged':
+      return new SlotVisibilityChangedEvent(event);
+  }
+}
