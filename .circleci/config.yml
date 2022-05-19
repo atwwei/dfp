@@ -10,7 +10,7 @@ orbs:
 executors:
   docker:
     docker:
-      - image: circleci/node:12.19-browsers
+      - image: cimg/node:12.19-browsers
 
 jobs:
   build:
@@ -37,30 +37,35 @@ jobs:
           name: Run karma
           command: npm run test
       - run:
-          name: Run build
+          name: Run publish test
           command: |
             npm run build
-            config=dist/package.json
+
+            config=./dist/package.json
             name=`grep -o -m 1 'name.*' $config | awk 'BEGIN{FS="\""} {print $3}'`
             version=`grep -o -m 1 'version.*' $config | awk 'BEGIN{FS="\""} {print $3}'`
-            echo Add git tag v$version
+
+            echo -e "\nAdd git tag v$version"
             git tag -a v$version -m "Publish $name@$version"
+
+            echo -e "\nDry run npm publish"
+            npm publish ./dist --access public --dry-run
       - when:
           condition:
             matches:
               pattern: ^(main|v\d+-lts)$
               value: << pipeline.git.branch >>
           steps:
-            - coveralls/upload
             - run:
                 name: Run publish
                 command: |
                   if [[ $CIRCLE_BRANCH = "main" ]]; then
-                    npm publish dist --access public
+                    npm publish ./dist --access public
                   else
-                    npm publish dist --access public --tag $CIRCLE_BRANCH
+                    npm publish ./dist --access public --tag $CIRCLE_BRANCH
                   fi
                   git push --tags
+            - coveralls/upload
       - store_test_results:
           path: reports
       - store_artifacts:
