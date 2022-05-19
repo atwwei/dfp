@@ -47,7 +47,7 @@ export class AppModule {}
 ...
 ```
 
-Use [googletag.PubAdsService](https://developers.google.com/publisher-tag/reference#googletag.pubadsservice) to customize page-level settings before the service is enabled.
+Use `DfpService`.
 
 ```
 import { DfpService } from '@wwei/dfp';
@@ -58,11 +58,27 @@ import { DfpService } from '@wwei/dfp';
 })
 export class AppComponent {
   constructor(private dfp: DfpService) {
-    // Use googletag to customize page-level settings
+    // Customize page-level settings before the service is enabled.
     this.dfp.cmd(() => {
       googletag.pubads().collapseEmptyDivs();
       googletag.pubads().enableSingleRequest();
       ...
+    });
+  }
+  /**
+   * Displays the rewarded ad. This method should not be called
+   * until the user has consented to view the ad.
+   */
+  displayRewardedAd() {
+    this.dfp.rewarded({
+      unitPath: '/22639388115/rewarded_web_example',
+    }).subscribe((rewarded) => {
+      if (rewarded.granted === true) {
+        // The rewarded is granted
+      } else {
+        // The rewarded is closed
+      }
+      // googletag.destroySlots([rewarded.slot]);
     });
   }
 }
@@ -144,10 +160,10 @@ _The following settings can override the above settings with the same name._
 
 ## Links
 
-| Name                  | URL                                         |
-| :-------------------- | :------------------------------------------ |
-| Online Examples       | https://atwwei.github.io/dfp                |
-| Google Publisher Tags | https://developers.google.com/publisher-tag |
+| Name            | URL                                                 |
+| :-------------- | :-------------------------------------------------- |
+| Online Examples | https://atwwei.github.io/dfp                        |
+| Google Samples  | https://developers.google.com/publisher-tag/samples |
 
 ## License
 

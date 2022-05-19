@@ -43,6 +43,9 @@ export class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
   @Input('dfpAdSize') size?: googletag.GeneralSize;
   @Input('dfpAdSizeMapping') sizeMapping?: googletag.SizeMappingArray;
   @Input('dfpAdCategoryExclusion') categoryExclusion?: string | string[];
+  /**
+   * This works only for non-SRA requests.
+   */
   @Input('dfpAdClickUrl') clickUrl?: string;
   @Input('dfpAdCollapseEmptyDiv') collapseEmptyDiv?:
     | boolean
@@ -51,7 +54,6 @@ export class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
   @Input('dfpAdSafeFrameConfig') safeFrameConfig?: googletag.SafeFrameConfig;
   @Input('dfpAdTargeting') targeting?: Record<string, string | string[]>;
   @Input('dfpAdAdsense') adsense?: Record<string, string>;
-  @Input('dfpAdContent') content?: string;
 
   constructor(
     private viewContainer: ViewContainerRef,
