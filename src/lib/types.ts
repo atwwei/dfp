@@ -17,6 +17,5 @@ export type DfpAd = {
   forceSafeFrame?: boolean;
   safeFrameConfig?: googletag.SafeFrameConfig;
   targeting?: Record<string, string | string[]>;
-  adsense?: Record<string, string>;
-  content?: string;
+  adsense?: Partial<Record<googletag.adsense.AttributeName, string>>;
 };

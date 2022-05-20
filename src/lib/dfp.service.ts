@@ -2,17 +2,16 @@ import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 
 import { Observable, Subject, timer } from 'rxjs';
-import { buffer, switchMap } from 'rxjs/operators';
+import { buffer, filter, map, switchMap, take } from 'rxjs/operators';
 
 import { GPT_SOURCE, DELAY_TIME } from './consts';
 import {
   Event,
-  ImpressionViewableEvent,
-  SlotOnloadEvent,
-  SlotRenderEndedEvent,
-  SlotRequestedEvent,
-  SlotResponseReceived,
-  SlotVisibilityChangedEvent,
+  EVENT_TYPES,
+  eventFactory,
+  RewardedSlotReadyEvent,
+  RewardedSlotGrantedEvent,
+  RewardedSlotClosedEvent,
 } from './events';
 import { Request, DisplaySlot, RefreshSlot } from './actions';
 import { ScriptOptions, DfpAd } from './types';
@@ -30,6 +29,7 @@ export class DfpService {
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     @Inject(DOCUMENT) private document: Document,
+    @Inject(GPT_SOURCE) private gptSource: string,
   ) {
     if (isPlatformBrowser(this.platformId)) {
       this.init();
@@ -39,7 +39,7 @@ export class DfpService {
   private init(): void {
     // GPT
     if (!(window as any).googletag) {
-      this.appendScript({ async: true, src: GPT_SOURCE });
+      this.appendScript({ async: true, src: this.gptSource });
       (window as any).googletag = (window as any).googletag || { cmd: [] };
     }
     // Single Request Queue
@@ -64,97 +64,61 @@ export class DfpService {
       });
     // Event Listeners
     googletag.cmd.push(() => {
-      const pubads = googletag.pubads();
-      pubads.addEventListener('impressionViewable', (event) => {
-        this.$events.next(new ImpressionViewableEvent(event));
-      });
-      pubads.addEventListener('slotOnload', (event) => {
-        this.$events.next(new SlotOnloadEvent(event));
-      });
-      pubads.addEventListener('slotRenderEnded', (event) => {
-        this.$events.next(new SlotRenderEndedEvent(event));
-      });
-      pubads.addEventListener('slotRequested', (event) => {
-        this.$events.next(new SlotRequestedEvent(event));
-      });
-      pubads.addEventListener('slotResponseReceived', (event) => {
-        this.$events.next(new SlotResponseReceived(event));
-      });
-      pubads.addEventListener('slotVisibilityChanged', (event) => {
-        this.$events.next(new SlotVisibilityChangedEvent(event));
-      });
+      EVENT_TYPES.forEach((type) =>
+        googletag.pubads().addEventListener(type, (event) => {
+          this.$events.next(eventFactory(type, event));
+        }),
+      );
     });
   }
 
-  define(ad: DfpAd, slot?: googletag.Slot): googletag.Slot {
+  define(ad: DfpAd, definedSlot?: googletag.Slot): googletag.Slot {
     let id = ad.id || '';
 
-    if (!slot) {
+    let slot: googletag.Slot;
+    if (definedSlot) {
+      slot = definedSlot;
+    } else {
       const exists = this.getSlot(id);
       if (exists) {
         this.destroy(exists);
       }
       if (ad.size) {
-        slot = googletag.defineSlot(ad.unitPath, ad.size, id) as googletag.Slot;
+        slot = googletag.defineSlot(ad.unitPath, ad.size, id)!;
       } else {
-        slot = googletag.defineOutOfPageSlot(ad.unitPath, id) as googletag.Slot;
+        slot = googletag.defineOutOfPageSlot(ad.unitPath, id)!;
       }
     }
 
-    if (ad.size && ad.content) {
-      slot.addService(googletag.content());
-      googletag.enableServices();
-      googletag.content().setContent(slot, ad.content);
-    } else {
-      if (ad.sizeMapping) {
-        slot.defineSizeMapping(ad.sizeMapping);
-      }
+    slot
+      .clearCategoryExclusions()
+      .clearTargeting()
+      .defineSizeMapping(ad.sizeMapping || [])
+      .updateTargetingFromMap(ad.targeting || {})
+      .setClickUrl(ad.clickUrl || '')
+      .setForceSafeFrame(ad.forceSafeFrame || false)
+      .setSafeFrameConfig(ad.safeFrameConfig || {});
 
-      slot.clearCategoryExclusions();
-      if (ad.categoryExclusion) {
-        if (ad.categoryExclusion instanceof Array) {
-          const s = slot;
-          ad.categoryExclusion.forEach((cat) => s.setCategoryExclusion(cat));
-        } else {
-          slot.setCategoryExclusion(ad.categoryExclusion);
-        }
-      }
-
-      if (typeof ad.forceSafeFrame === 'boolean') {
-        slot.setForceSafeFrame(ad.forceSafeFrame);
-      }
-
-      if (ad.safeFrameConfig) {
-        slot.setSafeFrameConfig(ad.safeFrameConfig);
-      }
-
-      slot.clearTargeting();
-      if (ad.targeting) {
-        slot.updateTargetingFromMap(ad.targeting);
-      }
-
-      if (ad.collapseEmptyDiv instanceof Array) {
-        slot.setCollapseEmptyDiv(
-          ad.collapseEmptyDiv[0],
-          ad.collapseEmptyDiv[1],
-        );
-      } else if (typeof ad.collapseEmptyDiv === 'boolean') {
-        slot.setCollapseEmptyDiv(ad.collapseEmptyDiv);
-      }
-
-      if (ad.clickUrl) {
-        slot.setClickUrl(ad.clickUrl);
-      }
-
-      if (ad.adsense) {
-        for (const key in ad.adsense) {
-          slot.set(key, ad.adsense[key]);
-        }
-      }
-
-      slot.addService(googletag.pubads());
-      googletag.enableServices();
+    if (ad.categoryExclusion instanceof Array) {
+      ad.categoryExclusion.forEach((cat) => slot.setCategoryExclusion(cat));
+    } else if ('string' === typeof ad.categoryExclusion) {
+      slot.setCategoryExclusion(ad.categoryExclusion);
     }
+
+    if (ad.collapseEmptyDiv instanceof Array) {
+      slot.setCollapseEmptyDiv(ad.collapseEmptyDiv[0], ad.collapseEmptyDiv[1]);
+    } else if ('boolean' === typeof ad.collapseEmptyDiv) {
+      slot.setCollapseEmptyDiv(ad.collapseEmptyDiv);
+    }
+
+    const attributes = ad.adsense || {};
+    for (const key in attributes) {
+      const attributeName = key as googletag.adsense.AttributeName;
+      slot.set(attributeName, attributes[attributeName]!);
+    }
+
+    slot.addService(googletag.pubads());
+    googletag.enableServices();
 
     return slot;
   }
@@ -165,6 +129,40 @@ export class DfpService {
 
   refresh(slot: googletag.Slot): void {
     this.$singleRequest.next(new RefreshSlot(slot));
+  }
+
+  /**
+   * Displays a rewarded ad. This method should not be called until the user has consented to view the ad.
+   */
+  rewarded(ad: DfpAd) {
+    const rewarded = this.define(
+      Object.assign(ad, {
+        id: googletag.enums.OutOfPageFormat.REWARDED,
+        size: undefined,
+      }),
+    );
+    this.display(rewarded);
+    return this.events.pipe(
+      filter((event) => {
+        if (event.slot === rewarded) {
+          if (event instanceof RewardedSlotReadyEvent) {
+            event.makeRewardedVisible();
+          }
+          return (
+            event instanceof RewardedSlotGrantedEvent ||
+            event instanceof RewardedSlotClosedEvent
+          );
+        }
+        return false;
+      }),
+      take(1),
+      map((event) => {
+        return {
+          slot: rewarded,
+          granted: event instanceof RewardedSlotGrantedEvent,
+        };
+      }),
+    );
   }
 
   destroy(slot: googletag.Slot): void {
