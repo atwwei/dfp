@@ -2,7 +2,7 @@ import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 
 import { Observable, Subject, timer } from 'rxjs';
-import { buffer, filter, map, switchMap, take } from 'rxjs/operators';
+import { buffer, filter, switchMap, take } from 'rxjs/operators';
 
 import { GPT_SOURCE, DELAY_TIME } from './consts';
 import {
@@ -152,13 +152,7 @@ export class DfpService {
         }
         return false;
       }),
-      take(1),
-      map((event) => {
-        return {
-          slot: rewarded,
-          granted: event instanceof RewardedSlotGrantedEvent,
-        };
-      }),
+      take<RewardedSlotGrantedEvent | RewardedSlotClosedEvent>(1),
     );
   }
 
