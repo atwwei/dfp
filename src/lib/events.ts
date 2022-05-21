@@ -1,4 +1,4 @@
-export class Event {
+export class Event implements googletag.events.Event {
   serviceName!: string;
   slot!: googletag.Slot;
   constructor(event: googletag.events.Event) {
