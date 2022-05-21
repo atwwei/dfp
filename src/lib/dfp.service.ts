@@ -135,12 +135,9 @@ export class DfpService {
    * Displays a rewarded ad. This method should not be called until the user has consented to view the ad.
    */
   rewarded(ad: DfpAd) {
-    const rewarded = this.define(
-      Object.assign(ad, {
-        id: googletag.enums.OutOfPageFormat.REWARDED,
-        size: undefined,
-      }),
-    );
+    ad.id = googletag.enums.OutOfPageFormat.REWARDED as any;
+    delete ad.size;
+    const rewarded = this.define(ad);
     this.display(rewarded);
     return this.events.pipe(
       filter((event) => {
