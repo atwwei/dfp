@@ -152,13 +152,7 @@ export class DfpService {
         }
         return false;
       }),
-      take(1),
-      map((event) => {
-        return {
-          slot: rewarded,
-          granted: event instanceof RewardedSlotGrantedEvent,
-        };
-      }),
+      take<RewardedSlotGrantedEvent | RewardedSlotClosedEvent>(1),
     );
   }
 
