@@ -4,10 +4,25 @@
 
 This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version **12.0.4**.
 
-[![CircleCI](https://img.shields.io/circleci/build/github/atwwei/dfp)](https://circleci.com/gh/atwwei/dfp)
-[![Coverage Status](https://coveralls.io/repos/github/atwwei/dfp/badge.svg)](https://coveralls.io/github/atwwei/dfp)
-[![version](https://badge.fury.io/js/@wwei%2Fdfp.svg)](https://www.npmjs.com/package/@wwei/dfp)
-[![license](https://img.shields.io/npm/l/express.svg?style=flat-square)](https://github.com/atwwei/dfp/blob/master/LICENSE)
+[![Build Status](https://img.shields.io/circleci/build/github/atwwei/dfp/main)](https://circleci.com/gh/atwwei/dfp/tree/main)
+[![Coverage Status](https://img.shields.io/coveralls/github/atwwei/dfp)](https://coveralls.io/github/atwwei/dfp?branch=main)
+[![NPM Version](https://img.shields.io/npm/v/@wwei/dfp)](https://www.npmjs.com/package/@wwei/dfp)
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
+[![GitHub License](https://img.shields.io/github/license/atwwei/dfp)](https://github.com/atwwei/dfp/blob/master/LICENSE)
+
+## Install
+
+```
+npm install @wwei/dfp@latest
+```
+
+| Angular Version | Install                       |
+| :-------------- | :---------------------------- |
+| 6、7            | npm install @wwei/dfp@v7-lts  |
+| 8               | npm install @wwei/dfp@v8-lts  |
+| 9               | npm install @wwei/dfp@v9-lts  |
+| 10              | npm install @wwei/dfp@v10-lts |
+| 11              | npm install @wwei/dfp@v11-lts |
 
 ## Usage
 
@@ -27,7 +42,7 @@ export class AppModule {}
 ...
 ```
 
-Use [googletag.PubAdsService](https://developers.google.com/publisher-tag/reference#googletag.pubadsservice) to customize page-level settings before the service is enabled.
+Use `DfpService`.
 
 ```
 import { DfpService } from '@wwei/dfp';
@@ -38,11 +53,27 @@ import { DfpService } from '@wwei/dfp';
 })
 export class AppComponent {
   constructor(private dfp: DfpService) {
-    // Use googletag to customize page-level settings
+    // Customize page-level settings before the service is enabled.
     this.dfp.cmd(() => {
       googletag.pubads().collapseEmptyDivs();
       googletag.pubads().enableSingleRequest();
       ...
+    });
+  }
+  /**
+   * Displays the rewarded ad. This method should not be called
+   * until the user has consented to view the ad.
+   */
+  displayRewardedAd() {
+    this.dfp.rewarded({
+      unitPath: '/22639388115/rewarded_web_example',
+    }).subscribe((rewarded) => {
+      if (rewarded.granted === true) {
+        // The rewarded is granted
+      } else {
+        // The rewarded is closed
+      }
+      // googletag.destroySlots([rewarded.slot]);
     });
   }
 }
@@ -124,8 +155,11 @@ _The following settings can override the above settings with the same name._
 
 ## Links
 
-| Name                  | URL                                         |
-| :-------------------- | :------------------------------------------ |
-| Online Examples       | https://atwwei.github.io/dfp                |
-| For Angular6          | https://www.npmjs.com/package/ngx-dfp       |
-| Google Publisher Tags | https://developers.google.com/publisher-tag |
+| Name            | URL                                                 |
+| :-------------- | :-------------------------------------------------- |
+| Online Examples | https://atwwei.github.io/dfp                        |
+| Google Samples  | https://developers.google.com/publisher-tag/samples |
+
+## License
+
+MIT © [Wei Wang](https://github.com/atwwei)

@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { timer } from 'rxjs';
 import { filter, switchMap, take } from 'rxjs/operators';
 
+import { GPT_SOURCE, GPT_SOURCE_STANDARD } from './consts';
 import { DfpAd } from './types';
 import { ImpressionViewableEvent, SlotRenderEndedEvent } from './events';
 import { DfpService } from './dfp.service';
@@ -66,6 +67,8 @@ describe('DfpAdDirective', () => {
   });
 
   it('Ad slot should be rendered', () => {
+    expect(TestBed.get(GPT_SOURCE)).toEqual(GPT_SOURCE_STANDARD);
+
     const dfpads = fixture.debugElement.queryAll(By.css('.dfp-ad'));
     dfpads.forEach((ad) => expect(ad.nativeElement.innerHTML).toBeTruthy());
 
@@ -74,19 +77,6 @@ describe('DfpAdDirective', () => {
 
     const dfpad2 = fixture.debugElement.query(By.css('#' + component.id2));
     expect(dfpad2).toBeFalsy();
-
-    const dfpad3 = fixture.debugElement.query(
-      By.css('#' + component.id3),
-    ).nativeElement;
-    expect(dfpad3.innerHTML).toBe('DFP AD CONTENT');
-
-    const slot = service.getSlot(
-      component.outOfPage ? component.outOfPage.id || '' : '',
-    ) as googletag.Slot;
-    expect(slot).toBeTruthy();
-    expect(slot.getOutOfPage()).toBe(true);
-
-    component.outOfPage = undefined;
   });
 
   it('Ad slot should be refreshed after changed', (done: DoneFn) => {
@@ -172,6 +162,22 @@ describe('DfpAdDirective', () => {
     });
     expect(node1.innerHTML).toBe(innerHTML + ';');
   });
+
+  it(
+    'Display a rewarded ad',
+    (done: DoneFn) => {
+      service
+        .rewarded({
+          unitPath: '/22639388115/rewarded_web_example',
+        })
+        .subscribe((rewarded) => {
+          expect(rewarded.granted).toBe(true);
+          googletag.destroySlots([rewarded.slot]);
+          done();
+        });
+    },
+    15 * 1000,
+  );
 });
 
 const dfpAd: DfpAd = {
@@ -212,26 +218,17 @@ const dfpAd: DfpAd = {
       class="dfp-ad"
     ></div>
     <div *dfpAd="''" [id]="id2"></div>
-    <div *dfpAd="dfpAd; id: id3; content: 'DFP AD CONTENT'"></div>
     <div style="display: none;">
       <div *dfpAd="dfpAd" id="parent-is-hidden"></div>
-    </div>
-    <div *dfpAd="outOfPage"></div>`,
+    </div>`,
   styles: ['div{height:92px;margin-top:1rem;border:1px solid #ccc}'],
 })
 export class TestComponent {
   dfpAd = dfpAd;
 
-  outOfPage: DfpAd | undefined = {
-    id: 'getOutOfPage',
-    unitPath: '/6355419/Travel',
-    targeting: { test: 'outofpage' },
-  };
-
   id?: string;
   id1 = 'dfp-ad-1';
   id2 = 'dfp-ad-2';
-  id3 = 'dfp-ad-3';
 
   targeting = dfpAd.targeting;
 }
