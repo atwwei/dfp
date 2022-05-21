@@ -9,7 +9,11 @@ import { filter, switchMap, take } from 'rxjs/operators';
 
 import { GPT_SOURCE, GPT_SOURCE_STANDARD } from './consts';
 import { DfpAd } from './types';
-import { ImpressionViewableEvent, SlotRenderEndedEvent } from './events';
+import {
+  ImpressionViewableEvent,
+  SlotRenderEndedEvent,
+  RewardedSlotGrantedEvent,
+} from './events';
 import { DfpService } from './dfp.service';
 import { DfpAdDirective } from './dfp-ad.directive';
 
@@ -170,9 +174,13 @@ describe('DfpAdDirective', () => {
         .rewarded({
           unitPath: '/22639388115/rewarded_web_example',
         })
-        .subscribe((rewarded) => {
-          expect(rewarded.granted).toBeTrue();
-          googletag.destroySlots([rewarded.slot]);
+        .subscribe((event) => {
+          if (event instanceof RewardedSlotGrantedEvent) {
+            expect(event.payload).toBeTruthy();
+          } else {
+            expect((event as any).payload).toBeFalsy();
+          }
+          googletag.destroySlots([event.slot]);
           done();
         });
     },
