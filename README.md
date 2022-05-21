@@ -67,13 +67,13 @@ export class AppComponent {
   displayRewardedAd() {
     this.dfp.rewarded({
       unitPath: '/22639388115/rewarded_web_example',
-    }).subscribe((rewarded) => {
-      if (rewarded.granted === true) {
+    }).subscribe((event) => {
+      if (event instanceof RewardedSlotGrantedEvent) {
         // The rewarded is granted
       } else {
         // The rewarded is closed
       }
-      // googletag.destroySlots([rewarded.slot]);
+      // googletag.destroySlots([event.slot]);
     });
   }
 }
