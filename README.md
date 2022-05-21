@@ -29,23 +29,26 @@ npm install @wwei/dfp@latest
 Add `DfpModule` to the imports of your NgModule.
 
 ```
+import { NgModule } from '@angular/core';
 import { DfpModule } from '@wwei/dfp';
 
 @NgModule({
   imports: [
-    ...
+    // ...
     DfpModule,
   ],
-  ...
+  // ...
 })
-export class AppModule {}
-...
+export class AppModule {
+  // ...
+}
 ```
 
 Use `DfpService`.
 
 ```
-import { DfpService } from '@wwei/dfp';
+import { Component } from '@angular/core';
+import { DfpService, RewardedSlotGrantedEvent } from '@wwei/dfp';
 
 @Component({
   selector: 'app-app',
@@ -57,7 +60,7 @@ export class AppComponent {
     this.dfp.cmd(() => {
       googletag.pubads().collapseEmptyDivs();
       googletag.pubads().enableSingleRequest();
-      ...
+      // ...
     });
   }
   /**
@@ -65,16 +68,18 @@ export class AppComponent {
    * until the user has consented to view the ad.
    */
   displayRewardedAd() {
-    this.dfp.rewarded({
-      unitPath: '/22639388115/rewarded_web_example',
-    }).subscribe((event) => {
-      if (event instanceof RewardedSlotGrantedEvent) {
-        // The rewarded is granted
-      } else {
-        // The rewarded is closed
-      }
-      // googletag.destroySlots([event.slot]);
-    });
+    this.dfp
+      .rewarded({
+        unitPath: '/22639388115/rewarded_web_example',
+      })
+      .subscribe((event) => {
+        if (event instanceof RewardedSlotGrantedEvent) {
+          // The rewarded is granted
+        } else {
+          // The rewarded is closed
+        }
+        // googletag.destroySlots([event.slot]);
+      });
   }
 }
 ```
