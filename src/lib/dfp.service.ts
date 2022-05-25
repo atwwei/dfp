@@ -1,7 +1,7 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 
-import { Observable, Subject, timer } from 'rxjs';
+import { EMPTY, Observable, Subject, timer } from 'rxjs';
 import { buffer, filter, switchMap, take } from 'rxjs/operators';
 
 import { GPT_SOURCE, DELAY_TIME } from './consts';
@@ -12,6 +12,7 @@ import {
   RewardedSlotReadyEvent,
   RewardedSlotGrantedEvent,
   RewardedSlotClosedEvent,
+  SlotRenderEndedEvent,
 } from './events';
 import { Request, DisplaySlot, RefreshSlot } from './actions';
 import { ScriptOptions, DfpAd } from './types';
@@ -135,10 +136,14 @@ export class DfpService {
    * Displays a rewarded ad. This method should not be called until the user has consented to view the ad.
    */
   rewarded(ad: DfpAd) {
-    ad.id = googletag.enums.OutOfPageFormat.REWARDED as any;
-    delete ad.size;
-    const rewarded = this.define(ad);
-    this.display(rewarded);
+    const rewarded = googletag.defineOutOfPageSlot(
+      ad.unitPath,
+      googletag.enums.OutOfPageFormat.REWARDED,
+    );
+    if (rewarded === null) {
+      return EMPTY;
+    }
+    googletag.display(this.define(ad, rewarded));
     return this.events.pipe(
       filter((event) => {
         if (event.slot === rewarded) {
@@ -146,13 +151,18 @@ export class DfpService {
             event.makeRewardedVisible();
           }
           return (
+            (event instanceof SlotRenderEndedEvent && event.isEmpty) ||
             event instanceof RewardedSlotGrantedEvent ||
             event instanceof RewardedSlotClosedEvent
           );
         }
         return false;
       }),
-      take<RewardedSlotGrantedEvent | RewardedSlotClosedEvent>(1),
+      take<
+        | SlotRenderEndedEvent
+        | RewardedSlotGrantedEvent
+        | RewardedSlotClosedEvent
+      >(1),
     );
   }
 
