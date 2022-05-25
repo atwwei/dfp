@@ -12,6 +12,7 @@ import { DfpAd } from './types';
 import {
   ImpressionViewableEvent,
   SlotRenderEndedEvent,
+  RewardedSlotClosedEvent,
   RewardedSlotGrantedEvent,
 } from './events';
 import { DfpService } from './dfp.service';
@@ -141,6 +142,59 @@ describe('DfpAdDirective', () => {
       });
   });
 
+  it(
+    'Display a rewarded ad',
+    (done: DoneFn) => {
+      const outOfPageSlot = service.define({
+        unitPath: '/22639388115/rewarded_web_example',
+      });
+      expect(outOfPageSlot.getOutOfPage()).toBe(true);
+      googletag.destroySlots([outOfPageSlot]);
+
+      let isNull = true;
+      service
+        .rewarded({
+          unitPath: '',
+        })
+        .subscribe({
+          next: () => (isNull = false),
+          complete: () => {
+            expect(isNull).toBe(true);
+            console.log('rewarded slot is null');
+          },
+        });
+
+      service
+        .rewarded({
+          unitPath: '/22639388115/rewarded_web_example_empty',
+        })
+        .subscribe((event) => {
+          expect(event instanceof SlotRenderEndedEvent).toBe(true);
+          googletag.destroySlots([event.slot]);
+        });
+
+      service
+        .rewarded({
+          unitPath: '/22639388115/rewarded_web_example',
+        })
+        .subscribe({
+          next: (event) => {
+            if (event instanceof RewardedSlotGrantedEvent) {
+              expect(event.payload).toBeTruthy();
+            } else {
+              expect(event instanceof RewardedSlotClosedEvent).toBe(true);
+            }
+            googletag.destroySlots([event.slot]);
+          },
+          complete: () => {
+            console.log('rewarded complete');
+            done();
+          },
+        });
+    },
+    15 * 1000,
+  );
+
   it('All slots should be removed', () => {
     fixture.destroy();
 
@@ -166,26 +220,6 @@ describe('DfpAdDirective', () => {
     });
     expect(node1.innerHTML).toBe(innerHTML + ';');
   });
-
-  it(
-    'Display a rewarded ad',
-    (done: DoneFn) => {
-      service
-        .rewarded({
-          unitPath: '/22639388115/rewarded_web_example',
-        })
-        .subscribe((event) => {
-          if (event instanceof RewardedSlotGrantedEvent) {
-            expect(event.payload).toBeTruthy();
-          } else {
-            expect((event as any).payload).toBeFalsy();
-          }
-          googletag.destroySlots([event.slot]);
-          done();
-        });
-    },
-    15 * 1000,
-  );
 });
 
 const dfpAd: DfpAd = {
