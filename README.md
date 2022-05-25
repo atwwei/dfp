@@ -80,8 +80,6 @@ export class AppComponent {
       .subscribe((event) => {
         if (event instanceof RewardedSlotGrantedEvent) {
           // The rewarded is granted
-        } else {
-          // The rewarded is closed
         }
         // googletag.destroySlots([event.slot]);
       });
