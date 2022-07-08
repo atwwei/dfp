@@ -17,67 +17,25 @@ jobs:
     executor: docker
     steps:
       - checkout
-      - node/install-packages
       - browser-tools/install-chrome
       - browser-tools/install-chromedriver
       - run:
-          name: User identity
+          name: Intsall latest packages
           command: |
-            git config --global user.email "atwwei@gmail.com"
-            git config --global user.name "circleci"
-            git remote set-url origin https://$GITHUB_TOKEN@github.com/atwwei/dfp
-            echo //registry.npmjs.org/:_authToken=$NPM_TOKEN >> ~/.npmrc
+            node ./scripts/upgrade.js
+            npm install
       - run:
-          name: Run prettier
-          command: npm run prettier
-      - run:
-          name: Run eslint
-          command: npm run lint
-      - run:
-          name: Run karma
-          command: npm run test
-      - run:
-          name: Run publish test
+          name: Run tests
           command: |
+            npm run prettier
+            npm run lint
+            npm run test
             npm run build
-
-            config=./dist/package.json
-            name=`grep -o -m 1 'name.*' $config | awk 'BEGIN{FS="\""} {print $3}'`
-            version=`grep -o -m 1 'version.*' $config | awk 'BEGIN{FS="\""} {print $3}'`
-
-            echo -e "\nAdd git tag v$version"
-            git tag -a v$version -m "Publish $name@$version"
-
-            echo -e "\nDry run npm publish"
-            npm publish ./dist --access public --dry-run
-      - when:
-          condition:
-            matches:
-              pattern: ^(main|v\d+-lts)$
-              value: << pipeline.git.branch >>
-          steps:
-            - run:
-                name: Run publish
-                command: |
-                  if [[ $CIRCLE_BRANCH = "main" ]]; then
-                    npm publish ./dist --access public
-                  else
-                    npm publish ./dist --access public --tag $CIRCLE_BRANCH
-                  fi
-                  git push --tags
-            - coveralls/upload
-      - run:
-          name: Compress artifacts
-          command: |
-            tar czf dist.tar.gz dist
-            tar czf coverage.tar.gz coverage
-      - store_test_results:
-          path: reports
       - store_artifacts:
-          path: coverage.tar.gz
+          path: ./package.json
       - store_artifacts:
-          path: dist.tar.gz
+          path: ./package-lock.json
 workflows:
-  dfp:
+  upgrade:
     jobs:
       - build
