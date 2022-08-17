@@ -1,11 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, NO_ERRORS_SCHEMA, PLATFORM_ID } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
-
-import { DfpService } from './dfp.service';
-import { DfpAdDirective } from './dfp-ad.directive';
 import { By } from '@angular/platform-browser';
-import { GPT_SOURCE, GPT_SOURCE_LIMITED_ADS } from './consts';
+
+import {
+  DfpAdDirective,
+  DfpService,
+  GPT_SOURCE,
+  GPT_SOURCE_LIMITED_ADS,
+} from '../public-api';
 
 describe('DfpAdDirective (Server Side)', () => {
   let service: DfpService;
