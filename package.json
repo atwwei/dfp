@@ -33,7 +33,7 @@
     "prettier-fix": "prettier --write \"./**/*.{ts,js,json,md,html,scss,yml}\""
   },
   "dependencies": {
-    "@types/googletag": "^2.0.1"
+    "@types/googletag": "~2.2.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1002.3",
