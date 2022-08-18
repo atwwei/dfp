@@ -10,6 +10,10 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![GitHub License](https://img.shields.io/github/license/atwwei/dfp)](https://github.com/atwwei/dfp/blob/master/LICENSE)
 
+## Dependencies
+
+[@types/googletag](https://www.npmjs.com/package/@types/googletag)
+
 ## Install
 
 ```
