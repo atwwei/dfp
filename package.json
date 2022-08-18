@@ -34,7 +34,7 @@
     "commit": "git-cz"
   },
   "dependencies": {
-    "@types/googletag": "^2.0.1"
+    "@types/googletag": "~2.2.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~12.1.1",
