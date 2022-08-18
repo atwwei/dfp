@@ -20,21 +20,21 @@ jobs:
       - browser-tools/install-chrome
       - browser-tools/install-chromedriver
       - run:
+          name: Intsall packages
+          command: |
+            npm install
+            mv package-lock.json package-lock-bak.json
+      - run:
           name: Intsall latest packages
           command: |
             node ./scripts/upgrade.js
             npm install
-      - run:
-          name: Run tests
-          command: |
-            npm run prettier
-            npm run lint
-            npm run test
-            npm run build
       - store_artifacts:
           path: ./package.json
       - store_artifacts:
           path: ./package-lock.json
+      - store_artifacts:
+          path: ./package-lock-bak.json
 workflows:
   upgrade:
     jobs:
