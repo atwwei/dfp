@@ -7,16 +7,17 @@ import { Router } from '@angular/router';
 import { timer } from 'rxjs';
 import { filter, switchMap, take } from 'rxjs/operators';
 
-import { GPT_SOURCE, GPT_SOURCE_STANDARD } from './consts';
-import { DfpAd } from './types';
 import {
+  DfpAd,
+  DfpAdDirective,
+  DfpService,
+  GPT_SOURCE,
+  GPT_SOURCE_STANDARD,
   ImpressionViewableEvent,
-  SlotRenderEndedEvent,
   RewardedSlotClosedEvent,
   RewardedSlotGrantedEvent,
-} from './events';
-import { DfpService } from './dfp.service';
-import { DfpAdDirective } from './dfp-ad.directive';
+  SlotRenderEndedEvent,
+} from '../public-api';
 
 describe('DfpAdDirective', () => {
   let service: DfpService;
@@ -247,7 +248,8 @@ const dfpAd: DfpAd = {
 };
 @Component({
   selector: 'dfp-ad-test',
-  template: ` <div *dfpAd="dfpAd; id: id" class="dfp-ad"></div>
+  template: `<div>
+    <div *dfpAd="dfpAd; id: id" class="dfp-ad"></div>
     <div
       *dfpAd="
         dfpAd.unitPath;
@@ -259,10 +261,11 @@ const dfpAd: DfpAd = {
       [id]="id1"
       class="dfp-ad"
     ></div>
-    <div *dfpAd="''" [id]="id2"></div>
+    <div><div *dfpAd="''" [id]="id2"></div></div>
     <div style="display: none;">
       <div *dfpAd="dfpAd" id="parent-is-hidden"></div>
-    </div>`,
+    </div>
+  </div>`,
   styles: ['div{height:92px;margin-top:1rem;border:1px solid #ccc}'],
 })
 export class TestComponent {
