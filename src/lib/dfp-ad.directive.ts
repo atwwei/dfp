@@ -106,6 +106,9 @@ export class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
 
     let parentElement = this.element.parentElement;
     while (parentElement) {
+      if (parentElement.getAttribute('ng-version')) {
+        break;
+      }
       if (
         parentElement.style.visibility === 'hidden' ||
         parentElement.style.display === 'none'
