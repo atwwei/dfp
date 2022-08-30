@@ -23,6 +23,10 @@ jobs:
           name: Intsall packages
           command: |
             npm install
+            npm run prettier
+            npm run lint
+            npm run test
+            npm run build
             mv package-lock.json package-lock-bak.json
       - run:
           name: Intsall latest packages
