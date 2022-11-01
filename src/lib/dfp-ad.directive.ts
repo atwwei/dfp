@@ -2,11 +2,13 @@
 import {
   Directive,
   DoCheck,
+  EventEmitter,
   Inject,
   Input,
   OnChanges,
   OnDestroy,
   Optional,
+  Output,
   PLATFORM_ID,
   SimpleChanges,
   TemplateRef,
@@ -21,15 +23,19 @@ import { filter, switchMap, takeUntil } from 'rxjs/operators';
 import { DELAY_TIME } from './consts';
 import { DfpService } from './dfp.service';
 import { DfpAd } from './types';
+import { SlotRenderEndedEvent } from './events';
 
 @Directive({
   selector: '[dfpAd]',
+  exportAs: 'dfpAd'
 })
 export class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
   private $destroy = new Subject<void>();
   private $update = new Subject<void>();
   private element?: HTMLElement;
   private slot?: googletag.Slot;
+
+  @Output() adRendered: EventEmitter<void> = new EventEmitter();
 
   @Input() set dfpAd(dfpAd: string | DfpAd) {
     if (typeof dfpAd === 'string') {
@@ -75,6 +81,18 @@ export class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
       )
       .subscribe(() => {
         this.dfp.cmd(() => this.display());
+      });
+
+    this.dfp.events
+      .pipe(filter((event) => 'isEmpty' in event))
+      .subscribe((event) => {
+        if (
+          !(event as SlotRenderEndedEvent).isEmpty &&
+          this.slot?.getSlotId() &&
+          this.slot?.getSlotId() === event.slot.getSlotId()
+        ) {
+          this.adRendered.emit();
+        }
       });
 
     this.router &&
