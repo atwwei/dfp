@@ -36,12 +36,18 @@ Add `DfpModule` to the imports of your NgModule.
 
 ```
 import { NgModule } from '@angular/core';
-import { DfpModule } from '@wwei/dfp';
+import { DfpModule, GPT_LOADER, GPT_SOURCE } from '@wwei/dfp';
 
 @NgModule({
   imports: [
     // ...
     DfpModule,
+  ],
+  providers: [
+    {
+      provide: GPT_LOADER,
+      useValue: of(GPT_SOURCE.LIMITED_ADS),
+    },
   ],
   // ...
 })
