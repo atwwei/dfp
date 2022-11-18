@@ -162,6 +162,25 @@ _The following settings can override the above settings with the same name._
 ></div>
 ```
 
+EventEmitter for `SlotRenderEndedEvent`、`SlotVisibilityChangedEvent`
+
+```
+<div
+  [dfpAd]="{
+    unitPath: '/6355419/Travel/Europe',
+    id: 'ad-div-id',
+    size: [
+      [300, 250],
+      [728, 90],
+      [750, 200]
+    ],
+    ...
+  }"
+  (renderEnded)="onRenderEnded($event)"
+  (visibilityChanged)="onVisibilityChanged($event)"
+></div>
+```
+
 ## Links
 
 | Name            | URL                                                 |
