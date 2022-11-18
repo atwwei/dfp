@@ -4,7 +4,7 @@ import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { EMPTY, Observable, Subject, timer } from 'rxjs';
 import { buffer, filter, switchMap, take } from 'rxjs/operators';
 
-import { GPT_SOURCE, DELAY_TIME } from './consts';
+import { DELAY_TIME, GPT_LOADER, GPT_SOURCE } from './consts';
 import {
   Event,
   EVENT_TYPES,
@@ -30,7 +30,7 @@ export class DfpService {
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     @Inject(DOCUMENT) private document: Document,
-    @Inject(GPT_SOURCE) private gptSource: string,
+    @Inject(GPT_LOADER) private gptLoader: Observable<GPT_SOURCE>,
   ) {
     if (isPlatformBrowser(this.platformId)) {
       this.init();
@@ -39,7 +39,9 @@ export class DfpService {
 
   private init(): void {
     // GPT
-    this.appendScript({ async: true, src: this.gptSource });
+    this.gptLoader.subscribe((gptSource) => {
+      this.appendScript({ async: true, src: gptSource });
+    });
     // Single Request Queue
     this.$singleRequest
       .pipe(
