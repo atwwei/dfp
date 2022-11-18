@@ -3,12 +3,7 @@ import { Component, NO_ERRORS_SCHEMA, PLATFORM_ID } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
 import { By } from '@angular/platform-browser';
 
-import {
-  DfpAdDirective,
-  DfpService,
-  GPT_SOURCE,
-  GPT_SOURCE_LIMITED_ADS,
-} from '../public-api';
+import { DfpAdDirective, DfpService } from '../public-api';
 
 describe('DfpAdDirective (Server Side)', () => {
   let service: DfpService;
@@ -18,14 +13,7 @@ describe('DfpAdDirective (Server Side)', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        DfpService,
-        { provide: PLATFORM_ID, useValue: 'server' },
-        {
-          provide: GPT_SOURCE,
-          useValue: GPT_SOURCE_LIMITED_ADS,
-        },
-      ],
+      providers: [DfpService, { provide: PLATFORM_ID, useValue: 'server' }],
       declarations: [TestComponent, DfpAdDirective],
       schemas: [NO_ERRORS_SCHEMA],
     });
@@ -42,8 +30,6 @@ describe('DfpAdDirective (Server Side)', () => {
   it('Simple test', () => {
     expect(platform).toBeDefined();
     expect(isPlatformServer(platform)).toBeTrue();
-
-    expect(TestBed.get(GPT_SOURCE)).toEqual(GPT_SOURCE_LIMITED_ADS);
 
     expect(service.cmd(() => {})).toBeFalse();
     expect(
