@@ -4,15 +4,15 @@ import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 
-import { timer } from 'rxjs';
+import { of, timer } from 'rxjs';
 import { filter, switchMap, take } from 'rxjs/operators';
 
 import {
   DfpAd,
   DfpAdDirective,
   DfpService,
+  GPT_LOADER,
   GPT_SOURCE,
-  GPT_SOURCE_STANDARD,
   ImpressionViewableEvent,
   RewardedSlotClosedEvent,
   RewardedSlotGrantedEvent,
@@ -33,7 +33,13 @@ describe('DfpAdDirective', () => {
           { path: 'test', component: TestComponent },
         ]),
       ],
-      providers: [DfpService],
+      providers: [
+        DfpService,
+        {
+          provide: GPT_LOADER,
+          useValue: of(GPT_SOURCE.LIMITED_ADS),
+        },
+      ],
       declarations: [TestComponent, DfpAdDirective],
       schemas: [NO_ERRORS_SCHEMA],
     });
@@ -78,8 +84,6 @@ describe('DfpAdDirective', () => {
   });
 
   it('Ad slot should be rendered', () => {
-    expect(TestBed.get(GPT_SOURCE)).toEqual(GPT_SOURCE_STANDARD);
-
     const dfpads = fixture.debugElement.queryAll(By.css('.dfp-ad'));
     dfpads.forEach((ad) => expect(ad.nativeElement.innerHTML).toBeTruthy());
 
