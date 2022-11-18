@@ -23,7 +23,7 @@ describe('DfpAdDirective', () => {
   let service: DfpService;
   let fixture: ComponentFixture<TestComponent>;
   let component: TestComponent;
-  let init = true;
+  let step = 1;
 
   beforeEach((done: DoneFn) => {
     TestBed.configureTestingModule({
@@ -39,12 +39,17 @@ describe('DfpAdDirective', () => {
     });
 
     service = TestBed.get(DfpService);
+    if (step > 3) {
+      done();
+      return;
+    }
     fixture = TestBed.createComponent(TestComponent);
     component = fixture.componentInstance;
+    component.step = step;
 
     fixture.detectChanges();
 
-    if (init) {
+    if (step == 1) {
       service.cmd(() => {
         googletag
           .defineSlot(dfpAd.unitPath, [1, 1], 'dfp-ad-1')
@@ -56,7 +61,7 @@ describe('DfpAdDirective', () => {
     service.events
       .pipe(
         filter((event) => {
-          if (init) {
+          if (step == 1) {
             return event instanceof ImpressionViewableEvent;
           } else {
             return event instanceof SlotRenderEndedEvent;
@@ -69,7 +74,7 @@ describe('DfpAdDirective', () => {
         done();
       });
 
-    init = false;
+    step += 1;
   });
 
   it('Ad slot should be rendered', () => {
@@ -83,6 +88,8 @@ describe('DfpAdDirective', () => {
 
     const dfpad2 = fixture.debugElement.query(By.css('#' + component.id2));
     expect(dfpad2).toBeFalsy();
+
+    expect(component.renderEnded instanceof SlotRenderEndedEvent).toBeTruthy();
   });
 
   it('Ad slot should be refreshed after changed', (done: DoneFn) => {
@@ -200,8 +207,6 @@ describe('DfpAdDirective', () => {
   );
 
   it('All slots should be removed', () => {
-    fixture.destroy();
-
     expect(service.getSlots().length).toBe(0);
   });
 
@@ -261,14 +266,22 @@ const dfpAd: DfpAd = {
       [id]="id1"
       class="dfp-ad"
     ></div>
-    <div><div *dfpAd="''" [id]="id2"></div></div>
-    <div style="display: none;">
-      <div *dfpAd="dfpAd" id="parent-is-hidden"></div>
+    <div *ngIf="step == 1">
+      <div
+        [dfpAd]="dfpAd"
+        class="dfp-ad"
+        (renderEnded)="onRenderEnded($event)"
+      ></div>
+      <div><div *dfpAd="''" [id]="id2"></div></div>
+      <div style="display: none;">
+        <div *dfpAd="dfpAd" id="parent-is-hidden"></div>
+      </div>
     </div>
   </div>`,
-  styles: ['div{height:92px;margin-top:1rem;border:1px solid #ccc}'],
+  styles: ['.dfp-ad{height:92px;margin-top:1rem;border:1px solid #ccc}'],
 })
 export class TestComponent {
+  step = 1;
   dfpAd = dfpAd;
 
   id?: string;
@@ -276,4 +289,10 @@ export class TestComponent {
   id2 = 'dfp-ad-2';
 
   targeting = dfpAd.targeting;
+
+  renderEnded?: SlotRenderEndedEvent;
+
+  onRenderEnded(event: SlotRenderEndedEvent) {
+    this.renderEnded = event;
+  }
 }
