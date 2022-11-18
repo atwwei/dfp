@@ -2,7 +2,7 @@
 
 @wwei/dfp is an [angular](https://angular.io) module for displaying google dfp ads using [Google Publisher Tag (Doubleclick GPT)](https://developers.google.com/publisher-tag/reference).
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version **13.2.5**.
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version **14.2.10**.
 
 [![Build Status](https://img.shields.io/circleci/build/github/atwwei/dfp/main)](https://circleci.com/gh/atwwei/dfp/tree/main)
 [![Coverage Status](https://img.shields.io/coveralls/github/atwwei/dfp)](https://coveralls.io/github/atwwei/dfp?branch=main)
@@ -159,6 +159,25 @@ _The following settings can override the above settings with the same name._
     targeting: { test: 'refresh' };
     adsense: { adsense_test_mode: 'on' };
   "
+></div>
+```
+
+EventEmitter for `SlotRenderEndedEvent`、`SlotVisibilityChangedEvent`
+
+```
+<div
+  [dfpAd]="{
+    unitPath: '/6355419/Travel/Europe',
+    id: 'ad-div-id',
+    size: [
+      [300, 250],
+      [728, 90],
+      [750, 200]
+    ],
+    ...
+  }"
+  (renderEnded)="onRenderEnded($event)"
+  (visibilityChanged)="onVisibilityChanged($event)"
 ></div>
 ```
 
