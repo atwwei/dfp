@@ -31,7 +31,7 @@ jobs:
       - run:
           name: Intsall latest packages
           command: |
-            node ./scripts/upgrade.js
+            # node ./scripts/upgrade.js
             npm install
       - store_artifacts:
           path: ./package.json
