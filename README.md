@@ -37,6 +37,7 @@ Add `DfpModule` to the imports of your NgModule.
 ```
 import { NgModule } from '@angular/core';
 import { DfpModule, GPT_LOADER, GPT_SOURCE } from '@wwei/dfp';
+import { of } from 'rxjs';
 
 @NgModule({
   imports: [
@@ -44,6 +45,7 @@ import { DfpModule, GPT_LOADER, GPT_SOURCE } from '@wwei/dfp';
     DfpModule,
   ],
   providers: [
+    // Use observable object to control the load time of GPT
     {
       provide: GPT_LOADER,
       useValue: of(GPT_SOURCE.LIMITED_ADS),
