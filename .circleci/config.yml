@@ -10,7 +10,7 @@ orbs:
 executors:
   docker:
     docker:
-      - image: cimg/node:12.19-browsers
+      - image: cimg/node:12.22-browsers
 
 jobs:
   build:
