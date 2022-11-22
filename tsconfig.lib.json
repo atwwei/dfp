@@ -8,5 +8,5 @@
     "inlineSources": true,
     "types": ["googletag"]
   },
-  "exclude": ["src/test.ts", "**/*.spec.ts"]
+  "exclude": ["**/*.spec.ts"]
 }
