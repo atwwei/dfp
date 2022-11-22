@@ -10,7 +10,7 @@ orbs:
 executors:
   docker:
     docker:
-      - image: cimg/node:16.14-browsers
+      - image: cimg/node:16.18-browsers
 
 jobs:
   build:
