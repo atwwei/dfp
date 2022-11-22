@@ -27,22 +27,24 @@ function CheckPackageJson(packageJsonFile) {
 
   const { name, version } = data;
 
-  const patchs = execSync(
-    'npm view ' + name + '@~' + version + ' version',
-  ).toString();
+  try {
+    const command = 'npm view ' + name + '@~' + version + ' version';
+    log(command);
+    const patchs = execSync(command).toString();
 
-  const match = patchs.trim().match(/(\d+\.\d+\.\d+)'?$/);
+    const match = patchs.trim().match(/(\d+\.\d+\.\d+)'?$/);
 
-  if (match) {
-    const latest = match[1];
-    if (latest > version || latest == version) {
-      const split = latest.split('.');
-      split[2] = parseInt(split[2]) + 1;
-      data.version = split.join('.');
-      log('Set version to ' + data.version, 34);
-      updated = true;
+    if (match) {
+      const latest = match[1];
+      if (latest > version || latest == version) {
+        const split = latest.split('.');
+        split[2] = parseInt(split[2]) + 1;
+        data.version = split.join('.');
+        log('Set version to ' + data.version, 34);
+        updated = true;
+      }
     }
-  }
+  } catch (error) {}
 
   if (updated) {
     log('Resave package settings to package.json', 32);

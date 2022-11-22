@@ -140,7 +140,9 @@ describe('DfpAdDirective', () => {
     const dfpads = fixture.debugElement.queryAll(By.css('.dfp-ad'));
     dfpads.forEach((ad) => expect(ad.nativeElement.innerHTML).toBeFalsy());
 
-    router.navigateByUrl('/test');
+    fixture.ngZone?.run(() => {
+      router.navigateByUrl('/test');
+    });
 
     service.events
       .pipe(
