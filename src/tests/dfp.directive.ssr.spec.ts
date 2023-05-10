@@ -8,8 +8,7 @@ import { DfpAdDirective, DfpService } from '../public-api';
 describe('DfpAdDirective (Server Side)', () => {
   let service: DfpService;
   let fixture: ComponentFixture<TestComponent>;
-  let component: TestComponent;
-  let platform: Object;
+  let platform: object;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -22,7 +21,6 @@ describe('DfpAdDirective (Server Side)', () => {
     platform = TestBed.inject(PLATFORM_ID);
 
     fixture = TestBed.createComponent(TestComponent);
-    component = fixture.componentInstance;
 
     fixture.detectChanges();
   });
@@ -31,7 +29,7 @@ describe('DfpAdDirective (Server Side)', () => {
     expect(platform).toBeDefined();
     expect(isPlatformServer(platform)).toBeTrue();
 
-    expect(service.cmd(() => {})).toBeFalse();
+    expect(service.cmd(() => true)).toBeFalse();
     expect(
       fixture.debugElement.query(By.css('.dfp-ad')).nativeElement.innerHTML,
     ).toBeFalsy();

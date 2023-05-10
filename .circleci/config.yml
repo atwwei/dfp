@@ -2,15 +2,15 @@
 version: 2.1
 
 orbs:
-  node: circleci/node@4.7.0
-  browser-tools: circleci/browser-tools@1.2.2
-  coveralls: coveralls/coveralls@1.0.6
-  github-cli: circleci/github-cli@1.0.4
+  node: circleci/node@5.1.0
+  browser-tools: circleci/browser-tools@1.4.1
+  coveralls: coveralls/coveralls@2.1.1
+  github-cli: circleci/github-cli@2.2.0
 
 executors:
   docker:
     docker:
-      - image: cimg/node:12.22-browsers
+      - image: cimg/node:16.20-browsers
 
 jobs:
   build:
@@ -28,28 +28,29 @@ jobs:
             git remote set-url origin https://$GITHUB_TOKEN@github.com/atwwei/dfp
             echo //registry.npmjs.org/:_authToken=$NPM_TOKEN >> ~/.npmrc
       - run:
-          name: Run prettier
-          command: npm run prettier
-      - run:
-          name: Run eslint
-          command: npm run lint
-      - run:
-          name: Run karma
+          name: Run test
           command: npm run test
       - run:
-          name: Run publish test
+          name: Run build
+          command: npm run build
+      - run:
+          name: Prepare publish
           command: |
-            npm run build
+            set +e
+            cd dist
 
-            config=./dist/package.json
-            name=`grep -o -m 1 'name.*' $config | awk 'BEGIN{FS="\""} {print $3}'`
-            version=`grep -o -m 1 'version.*' $config | awk 'BEGIN{FS="\""} {print $3}'`
+            name=`npm pkg get name | sed 's/"//g'`
+            version=`npm pkg get version | sed 's/"//g'`
 
-            echo -e "\nAdd git tag v$version"
-            git tag -a v$version -m "Publish $name@$version"
+            versions=`npm view ${name}@~${version} version 2>/dev/null | sed "s/.* //g" | sed "s/'//g"`
+            if [[ "$versions" != "" ]]; then
+                npm pkg set version=${versions##*[[:space:]]}
+                npm version patch
+            fi
 
-            echo -e "\nDry run npm publish"
-            npm publish ./dist --access public --dry-run
+            npm pkg delete scripts lint-staged dependencies.tslib devDependencies
+
+            npm publish --access public --dry-run
       - when:
           condition:
             matches:

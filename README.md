@@ -2,7 +2,7 @@
 
 @wwei/dfp is an [angular](https://angular.io) module for displaying google dfp ads using [Google Publisher Tag (Doubleclick GPT)](https://developers.google.com/publisher-tag/reference).
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version **12.0.4**.
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version **16.2.0**.
 
 [![Build Status](https://img.shields.io/circleci/build/github/atwwei/dfp/main)](https://circleci.com/gh/atwwei/dfp/tree/main)
 [![Coverage Status](https://img.shields.io/coverallsCoverage/github/atwwei/dfp)](https://coveralls.io/github/atwwei/dfp?branch=main)
@@ -17,14 +17,7 @@ npm install @wwei/dfp@latest
 
 | Angular Version | Install                       |
 | :-------------- | :---------------------------- |
-| 6、7            | npm install @wwei/dfp@v7-lts  |
-| 8               | npm install @wwei/dfp@v8-lts  |
-| 9               | npm install @wwei/dfp@v9-lts  |
-| 10              | npm install @wwei/dfp@v10-lts |
-| 11              | npm install @wwei/dfp@v11-lts |
-| 12              | npm install @wwei/dfp@v12-lts |
-| 13              | npm install @wwei/dfp@v13-lts |
-| 14              | npm install @wwei/dfp@v14-lts |
+| 15              | npm install @wwei/dfp@v15-lts |
 
 ## Usage
 
