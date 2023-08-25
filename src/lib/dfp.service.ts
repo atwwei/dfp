@@ -54,7 +54,11 @@ export class DfpService {
         acts.forEach((act) => {
           if (act instanceof DisplaySlot) {
             googletag.display(act.slot);
-          } else {
+          }
+          if (
+            act instanceof RefreshSlot ||
+            googletag.pubads().isInitialLoadDisabled()
+          ) {
             refreshSlots.push(act.slot);
           }
         });
