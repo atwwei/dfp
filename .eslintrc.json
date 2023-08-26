@@ -1,61 +1,31 @@
-// Eslint Rules：https://eslint.org/docs/rules/
 {
   "root": true,
   "overrides": [
     {
-      "globals": {
-        "window": true,
-        "document": true,
-        "googletag": true
-      },
       "files": ["*.ts"],
-      "parserOptions": {
-        "project": ["tsconfig.json", "e2e/tsconfig.json"],
-        "createDefaultProgram": true
-      },
       "extends": [
         "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
         "plugin:@angular-eslint/recommended",
-        "plugin:@angular-eslint/template/process-inline-templates",
-        "plugin:prettier/recommended"
+        "plugin:@angular-eslint/template/process-inline-templates"
       ],
       "rules": {
-        "eqeqeq": ["error", "always"],
-        "no-confusing-arrow": ["error", { "allowParens": true }],
-        "no-implicit-coercion": "error",
-        "no-multi-assign": "error",
-        "no-template-curly-in-string": "error",
-        "no-unused-vars": ["error", { "args": "none" }],
-        "no-useless-constructor": "error",
-        "no-use-before-define": "error"
-      }
-    },
-    // NOTE: WE ARE NOT APPLYING PRETTIER IN THIS OVERRIDE, ONLY @ANGULAR-ESLINT/TEMPLATE
-    {
-      "files": ["*.html"],
-      "extends": ["plugin:@angular-eslint/template/recommended"],
-      "rules": {}
-    },
-    // NOTE: WE ARE NOT APPLYING @ANGULAR-ESLINT/TEMPLATE IN THIS OVERRIDE, ONLY PRETTIER
-    {
-      "files": ["*.html"],
-      "excludedFiles": ["*inline-template-*.component.html"],
-      "extends": ["plugin:prettier/recommended"],
-      "rules": {
-        // NOTE: WE ARE OVERRIDING THE DEFAULT CONFIG TO ALWAYS SET THE PARSER TO ANGULAR (SEE BELOW)
-        "prettier/prettier": ["error", { "parser": "angular" }]
-      }
-    },
-    {
-      "env": {
-        "node": true
-      },
-      "files": ["scripts/*.js"],
-      "extends": ["eslint:recommended", "plugin:prettier/recommended"],
-      "rules": {},
-      "parserOptions": {
-        "ecmaVersion": 6,
-        "sourceType": "module"
+        "@angular-eslint/directive-selector": [
+          "error",
+          {
+            "type": "attribute",
+            "prefix": "dfp",
+            "style": "camelCase"
+          }
+        ],
+        "@angular-eslint/component-selector": [
+          "error",
+          {
+            "type": "element",
+            "prefix": "dfp",
+            "style": "kebab-case"
+          }
+        ]
       }
     }
   ]

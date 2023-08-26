@@ -28,7 +28,7 @@ export class DfpService {
   }
 
   constructor(
-    @Inject(PLATFORM_ID) private platformId: Object,
+    @Inject(PLATFORM_ID) private platformId: object,
     @Inject(DOCUMENT) private document: Document,
     @Inject(GPT_LOADER) private gptLoader: Observable<GPT_SOURCE>,
   ) {
@@ -54,7 +54,11 @@ export class DfpService {
         acts.forEach((act) => {
           if (act instanceof DisplaySlot) {
             googletag.display(act.slot);
-          } else {
+          }
+          if (
+            act instanceof RefreshSlot ||
+            googletag.pubads().isInitialLoadDisabled()
+          ) {
             refreshSlots.push(act.slot);
           }
         });
@@ -73,7 +77,7 @@ export class DfpService {
   }
 
   define(ad: DfpAd, definedSlot?: googletag.Slot): googletag.Slot {
-    let id = ad.id || '';
+    const id = ad.id || '';
 
     let slot: googletag.Slot;
     if (definedSlot) {
@@ -84,9 +88,9 @@ export class DfpService {
         this.destroy(exists);
       }
       if (ad.size) {
-        slot = googletag.defineSlot(ad.unitPath, ad.size, id)!;
+        slot = googletag.defineSlot(ad.unitPath, ad.size, id) as googletag.Slot;
       } else {
-        slot = googletag.defineOutOfPageSlot(ad.unitPath, id)!;
+        slot = googletag.defineOutOfPageSlot(ad.unitPath, id) as googletag.Slot;
       }
     }
 
@@ -114,7 +118,7 @@ export class DfpService {
     const attributes = ad.adsense || {};
     for (const key in attributes) {
       const attributeName = key as googletag.adsense.AttributeName;
-      slot.set(attributeName, attributes[attributeName]!);
+      slot.set(attributeName, attributes[attributeName] ?? '');
     }
 
     slot.addService(googletag.pubads());
@@ -176,7 +180,7 @@ export class DfpService {
   }
 
   getSlots(elementIds?: string[]): googletag.Slot[] {
-    let slots: googletag.Slot[] = googletag.pubads().getSlots();
+    const slots: googletag.Slot[] = googletag.pubads().getSlots();
     return slots.filter(
       (slot) =>
         !elementIds || elementIds.indexOf(slot.getSlotElementId()) !== -1,

@@ -64,7 +64,7 @@ export class DfpAdDirective implements DoCheck, OnChanges, OnDestroy {
   @Input('dfpAdAdsense') adsense?: Record<string, string>;
 
   constructor(
-    @Inject(PLATFORM_ID) platformId: Object,
+    @Inject(PLATFORM_ID) platformId: object,
     private viewContainer: ViewContainerRef,
     private dfp: DfpService,
     @Optional() private router?: Router,

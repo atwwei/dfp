@@ -87,7 +87,7 @@ describe('DfpAdDirective', () => {
     const dfpads = fixture.debugElement.queryAll(By.css('.dfp-ad'));
     dfpads.forEach((ad) => expect(ad.nativeElement.innerHTML).toBeTruthy());
 
-    var gpt_unit_id = dfpads[0].nativeElement.id;
+    const gpt_unit_id = dfpads[0].nativeElement.id;
     expect(gpt_unit_id).toMatch(/^gpt_unit_/);
 
     const dfpad2 = fixture.debugElement.query(By.css('#' + component.id2));
@@ -272,7 +272,7 @@ const dfpAd: DfpAd = {
       [id]="id1"
       class="dfp-ad"
     ></div>
-    <div *ngIf="step == 1">
+    <div *ngIf="step === 1">
       <div
         [dfpAd]="dfpAd"
         class="dfp-ad"
