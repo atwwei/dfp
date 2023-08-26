@@ -30,6 +30,12 @@ export class SlotRenderEndedEvent
   extends Event
   implements googletag.events.SlotRenderEndedEvent
 {
+  companyIds!: number[] | null;
+  creativeTemplateId!: number | null;
+  isBackfill!: boolean;
+  labelIds!: number[] | null;
+  slotContentChanged!: boolean;
+  yieldGroupIds!: number[] | null;
   advertiserId!: number | null;
   campaignId!: number | null;
   creativeId!: number | null;
@@ -51,7 +57,7 @@ export class SlotVisibilityChangedEvent
   inViewPercentage!: number;
 }
 
-export const EVENT_TYPES: googletag.events.EventType[] = [
+export const EVENT_TYPES: Array<keyof googletag.events.EventTypeMap> = [
   'impressionViewable',
   'rewardedSlotClosed',
   'rewardedSlotGranted',
@@ -64,7 +70,7 @@ export const EVENT_TYPES: googletag.events.EventType[] = [
 ];
 
 export function eventFactory(
-  type: googletag.events.EventType,
+  type: keyof googletag.events.EventTypeMap,
   event: googletag.events.Event,
 ): Event {
   switch (type) {

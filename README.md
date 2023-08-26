@@ -21,14 +21,7 @@ npm install @wwei/dfp@latest
 
 | Angular Version | Install                       |
 | :-------------- | :---------------------------- |
-| 6、7            | npm install @wwei/dfp@v7-lts  |
-| 8               | npm install @wwei/dfp@v8-lts  |
-| 9               | npm install @wwei/dfp@v9-lts  |
-| 10              | npm install @wwei/dfp@v10-lts |
-| 11              | npm install @wwei/dfp@v11-lts |
-| 12              | npm install @wwei/dfp@v12-lts |
-| 13              | npm install @wwei/dfp@v13-lts |
-| 14              | npm install @wwei/dfp@v14-lts |
+| 15              | npm install @wwei/dfp@v15-lts |
 
 ## Usage
 
